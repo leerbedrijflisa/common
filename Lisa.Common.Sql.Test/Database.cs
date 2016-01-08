@@ -29,6 +29,17 @@ namespace Lisa.Common.Sql.Test
             return _gateway.Insert(query, movie);
         }
 
+        public void CreateMovies(IEnumerable<Movie> movies)
+        {
+            _gateway.ProcessTransaction(() =>
+            {
+                foreach (var movie in movies)
+                {
+                    CreateMovie(movie);
+                }
+            });
+        }
+
         public void DeleteMovie(object id)
         {
             var query = "delete from movies where id=@Id";

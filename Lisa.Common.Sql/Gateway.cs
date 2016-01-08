@@ -51,6 +51,27 @@ namespace Lisa.Common.Sql
             command.ExecuteNonQuery();
         }
 
+        public void ProcessTransaction(Action transaction)
+        {
+            if (_transaction != null)
+            {
+                throw new InvalidOperationException("Already processing a transaction.");
+            }
+
+            _transaction = _connection.BeginTransaction();
+
+            try
+            {
+                transaction();
+                _transaction.Commit();
+            }
+            catch
+            {
+                _transaction.Rollback();
+                throw;
+            }
+        }
+
         public void Dispose()
         {
             _connection?.Close();
@@ -59,13 +80,11 @@ namespace Lisa.Common.Sql
 
         private SqlCommand CreateCommand(string query, object parameters = null)
         {
-            var command = _connection.CreateCommand();
-            command.CommandText = QueryBuilder.Build(query, parameters);
-            command.CommandType = CommandType.Text;
-
-            return command;
+            var commandText = QueryBuilder.Build(query, parameters);
+            return new SqlCommand(commandText, _connection, _transaction);
         }
 
         private SqlConnection _connection;
+        private SqlTransaction _transaction;
     }
 }

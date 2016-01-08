@@ -27,6 +27,13 @@ namespace Lisa.Common.Sql.Test
             return new HttpOkObjectResult(created);
         }
 
+        [HttpPost("many")]
+        public ActionResult PostMany([FromBody] Movie[] movies)
+        {
+            _db.CreateMovies(movies);
+            return new HttpOkResult();
+        }
+
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
