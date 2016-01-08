@@ -17,7 +17,7 @@ namespace Lisa.Common.Sql
 
         private static IEnumerable<QueryParameterInfo> ExtractParameters(string query, object values)
         {
-            var valueParameters = ExtractParameters<ValueParameterInfo>(@"(?<quote>')@(?<name>\w+)(?<-quote>')|(?<!_)@(?<name>\w+)", query, values);
+            var valueParameters = ExtractParameters<ValueParameterInfo>(@"(?<quote>')@(?<name>\w+)(?<-quote>')|(?<!_)@(?<!@@)(?<name>\w+)", query, values);
             var nameParameters = ExtractParameters<NameParameterInfo>(@"(?<bracket>\[)\$(?<name>\w+)(?<-bracket>\])|\$(?<name>\w+)", query, values);
             return valueParameters.Union(nameParameters);
         }
@@ -42,7 +42,7 @@ namespace Lisa.Common.Sql
 
         private static object GetParameterValue(string name, object values)
         {
-            var property = values.GetType().GetProperty(name);
+            var property = values?.GetType().GetProperty(name);
             if (property == null)
             {
                 var message = string.Format("No value specified for parameter '{0}'.", name);
