@@ -60,7 +60,6 @@ namespace Lisa.Common.Sql
 
             using (_transaction = _connection.BeginTransaction())
             {
-
                 try
                 {
                     transaction();
