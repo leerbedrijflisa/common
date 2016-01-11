@@ -58,18 +58,22 @@ namespace Lisa.Common.Sql
                 throw new InvalidOperationException("Already processing a transaction.");
             }
 
-            _transaction = _connection.BeginTransaction();
+            using (_transaction = _connection.BeginTransaction())
+            {
 
-            try
-            {
-                transaction();
-                _transaction.Commit();
+                try
+                {
+                    transaction();
+                    _transaction.Commit();
+                }
+                catch
+                {
+                    _transaction.Rollback();
+                    throw;
+                }
             }
-            catch
-            {
-                _transaction.Rollback();
-                throw;
-            }
+
+            _transaction = null;
         }
 
         public void Dispose()

@@ -38,6 +38,14 @@ namespace Lisa.Common.Sql.Test
                     CreateMovie(movie);
                 }
             });
+
+            _gateway.ProcessTransaction(() =>
+            {
+                foreach (var movie in movies)
+                {
+                    CreateMovie(movie);
+                }
+            });
         }
 
         public void DeleteMovie(object id)
