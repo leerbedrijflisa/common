@@ -126,5 +126,19 @@ namespace Lisa.Common.UnitTests.Sql
             string result = QueryBuilder.Build(query);
             Assert.Equal("SELECT @@identity", result);
         }
+
+        [Fact]
+        public void ItCanHandleNameAndValueParametersInTheSameQuery()
+        {
+            string query = "SELECT * FROM $Table WHERE Name='@Name'";
+            object parameters = new
+            {
+                Table = "Planets",
+                Name = "Q'onos"
+            };
+
+            string result = QueryBuilder.Build(query, parameters);
+            Assert.Equal("SELECT * FROM [Planets] WHERE Name='Q''onos'", result);
+        }
     }
 }

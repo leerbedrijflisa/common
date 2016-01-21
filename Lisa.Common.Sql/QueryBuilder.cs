@@ -58,7 +58,7 @@ namespace Lisa.Common.Sql
             int index = 0;
             string copy;
 
-            foreach (var parameter in parameters)
+            foreach (var parameter in parameters.OrderBy(p => p.Start))
             {
                 copy = query.Substring(index, parameter.Start - index);
                 result.Append(copy);
