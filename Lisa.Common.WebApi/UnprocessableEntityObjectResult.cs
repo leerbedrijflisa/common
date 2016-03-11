@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNet.Mvc;
 
 namespace Lisa.Common.WebApi
 {
-    public class UnprocessableEntityObjectResult
+    public class UnprocessableEntityObjectResult : ObjectResult
     {
+        public UnprocessableEntityObjectResult(object value) : base(value)
+        {
+            StatusCode = 422;
+        }
     }
 }
