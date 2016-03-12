@@ -6,6 +6,25 @@ namespace Lisa.Common.WebApi
 {
     public class DynamicModel : DynamicObject
     {
+        public object this[string name]
+        {
+            get
+            {
+                var property = _properties.SingleOrDefault(p => p.Key.ToLowerInvariant() == name.ToLowerInvariant());
+                if (property.Key == null)
+                {
+                    throw new KeyNotFoundException($"A property with the name {name} does not exist.");
+                }
+
+                return property.Value;
+            }
+        }
+
+        public bool Contains(string name)
+        {
+            return _properties.Any(p => p.Key.ToLowerInvariant() == name.ToLowerInvariant());
+        }
+
         public object GetMetadata()
         {
             return _metadata;
