@@ -40,5 +40,27 @@ namespace Lisa.Common.UnitTests.WebApi
 
             Assert.Equal(metadata, model.GetMetadata());
         }
+
+        [Fact]
+        public void ItCanListItsMembersNames()
+        {
+            dynamic model = new DynamicModel();
+            model.foo = 2;
+            model.bar = "far";
+
+            var memberNames = model.GetDynamicMemberNames();
+            Assert.Contains("foo", memberNames);
+            Assert.Contains("bar", memberNames);
+        }
+
+        [Fact]
+        public void ItPreservesCaseWhenListingMemberNames()
+        {
+            dynamic model = new DynamicModel();
+            model.FooBar = "too far";
+
+            var memberNames = model.GetDynamicMemberNames();
+            Assert.Contains("FooBar", memberNames);
+        }
     }
 }

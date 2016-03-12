@@ -19,20 +19,25 @@ namespace Lisa.Common.WebApi
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             var memberName = binder.Name.ToLowerInvariant();
-            if (!_properties.ContainsKey(memberName))
+            var property = _properties.SingleOrDefault(p => p.Key.ToLowerInvariant() == memberName);
+            if (property.Key == null)
             {
                 return base.TryGetMember(binder, out result);
             }
 
-            result = _properties[memberName];
+            result = property.Value;
             return true;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            var memberName = binder.Name.ToLowerInvariant();
-            _properties[memberName] = value;
+            _properties[binder.Name] = value;
             return true;
+        }
+
+        public override IEnumerable<string> GetDynamicMemberNames()
+        {
+            return _properties.Keys;
         }
 
         private Dictionary<string, object> _properties = new Dictionary<string, object>();
