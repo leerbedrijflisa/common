@@ -30,5 +30,15 @@ namespace Lisa.Common.UnitTests.WebApi
 
             Assert.Equal("bar", model.foo);
         }
+
+        [Fact]
+        public void ItCanStoreMetadata()
+        {
+            dynamic model = new DynamicModel();
+            object metadata = new { Foo = "Bar" };
+            model.SetMetadata(metadata);
+
+            Assert.Equal(metadata, model.GetMetadata());
+        }
     }
 }

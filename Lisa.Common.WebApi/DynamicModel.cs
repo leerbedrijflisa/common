@@ -6,6 +6,16 @@ namespace Lisa.Common.WebApi
 {
     public class DynamicModel : DynamicObject
     {
+        public object GetMetadata()
+        {
+            return _metadata;
+        }
+
+        public void SetMetadata(object metadata)
+        {
+            _metadata = metadata;
+        }
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             var memberName = binder.Name.ToLowerInvariant();
@@ -26,5 +36,6 @@ namespace Lisa.Common.WebApi
         }
 
         private Dictionary<string, object> _properties = new Dictionary<string, object>();
+        private object _metadata;
     }
 }
