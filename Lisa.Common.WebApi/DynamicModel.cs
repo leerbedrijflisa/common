@@ -10,7 +10,7 @@ namespace Lisa.Common.WebApi
         {
             get
             {
-                var property = _properties.SingleOrDefault(p => p.Key.ToLowerInvariant() == name.ToLowerInvariant());
+                var property = Properties.SingleOrDefault(p => p.Key.ToLowerInvariant() == name.ToLowerInvariant());
                 if (property.Key == null)
                 {
                     throw new KeyNotFoundException($"A property with the name {name} does not exist.");
@@ -22,7 +22,7 @@ namespace Lisa.Common.WebApi
 
         public bool Contains(string name)
         {
-            return _properties.Any(p => p.Key.ToLowerInvariant() == name.ToLowerInvariant());
+            return Properties.Any(p => p.Key.ToLowerInvariant() == name.ToLowerInvariant());
         }
 
         public object GetMetadata()
@@ -38,7 +38,7 @@ namespace Lisa.Common.WebApi
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             var memberName = binder.Name.ToLowerInvariant();
-            var property = _properties.SingleOrDefault(p => p.Key.ToLowerInvariant() == memberName);
+            var property = Properties.SingleOrDefault(p => p.Key.ToLowerInvariant() == memberName);
             if (property.Key == null)
             {
                 return base.TryGetMember(binder, out result);
@@ -50,16 +50,17 @@ namespace Lisa.Common.WebApi
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            _properties[binder.Name] = value;
+            Properties[binder.Name] = value;
             return true;
         }
 
         public override IEnumerable<string> GetDynamicMemberNames()
         {
-            return _properties.Keys;
+            return Properties.Keys;
         }
 
-        private Dictionary<string, object> _properties = new Dictionary<string, object>();
+        internal IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+
         private object _metadata;
     }
 }

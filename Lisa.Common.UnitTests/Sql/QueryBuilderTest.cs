@@ -2,7 +2,7 @@
 using System;
 using Xunit;
 
-namespace Lisa.Common.UnitTests.Sql
+namespace Lisa.Common.UnitTests
 {
     public class QueryBuilderTest
     {

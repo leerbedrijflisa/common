@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Mvc;
+﻿using System;
+using Microsoft.AspNet.Mvc;
 
 namespace Lisa.Common.WebApi.Test
 {
@@ -17,7 +18,17 @@ namespace Lisa.Common.WebApi.Test
         [HttpPost]
         public ActionResult Post([FromBody] DynamicModel model)
         {
-            return new HttpOkResult();
+            var result = new AnyValidator().Validate(model);
+
+            return new UnprocessableEntityObjectResult(result.Errors);
+        }
+    }
+
+    public class AnyValidator : Validator
+    {
+        public override void ValidateModel()
+        {
+            Required("something");
         }
     }
 }

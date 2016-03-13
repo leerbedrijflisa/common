@@ -3,7 +3,7 @@ using Microsoft.CSharp.RuntimeBinder;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Lisa.Common.UnitTests.WebApi
+namespace Lisa.Common.UnitTests
 {
     public class DynamicModelTest
     {
