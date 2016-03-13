@@ -8,7 +8,7 @@ namespace Lisa.Common.WebApi
         public ValidationResult Validate(DynamicModel model)
         {
             Model = model;
-            _fields = new Dictionary<string, bool>();
+            _fields = new Dictionary<string, FieldStatus>();
 
             Property = new KeyValuePair<string, object>(string.Empty, null);
             ValidateModel();
@@ -18,11 +18,26 @@ namespace Lisa.Common.WebApi
             {
                 Property = property;
                 ValidateModel();
+
+                var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == property.Key.ToLowerInvariant());
+                if (field.Key == null)
+                {
+                    var error = new Error
+                    {
+                        Code = ErrorCode.InvalidField,
+                        Message = $"'{property.Key}' is not a valid field.",
+                        Values = new
+                        {
+                            Field = property.Key
+                        }
+                    };
+                    Result.Errors.Add(error);
+                }
             }
 
             foreach (var field in _fields)
             {
-                if (field.Value == false)
+                if (field.Value == FieldStatus.Required)
                 {
                     var error = new Error
                     {
@@ -48,12 +63,27 @@ namespace Lisa.Common.WebApi
             var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == name);
             if (field.Key == null)
             {
-                _fields[fieldName] = false;
+                _fields[fieldName] = FieldStatus.Required;
             }
 
             if (Property.Key.ToLowerInvariant() == name)
             {
-                _fields[fieldName] = true;
+                _fields[fieldName] = FieldStatus.Present;
+            }
+        }
+
+        public void Optional(string fieldName)
+        {
+            var name = fieldName.ToLowerInvariant();
+            var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == name);
+            if (field.Key == null)
+            {
+                _fields[fieldName] = FieldStatus.Optional;
+            }
+
+            if (Property.Key.ToLowerInvariant() == name)
+            {
+                _fields[fieldName] = FieldStatus.Present;
             }
         }
 
@@ -61,6 +91,6 @@ namespace Lisa.Common.WebApi
         protected DynamicModel Model { get; private set; }
         protected KeyValuePair<string, object> Property { get; private set; }
 
-        private Dictionary<string, bool> _fields;
+        private Dictionary<string, FieldStatus> _fields;
     }
 }

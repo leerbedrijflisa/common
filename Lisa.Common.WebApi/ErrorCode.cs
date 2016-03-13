@@ -13,5 +13,6 @@
     public static class ErrorCode
     {
         public static int FieldMissing { get; } = 1 << 22;
+        public static int InvalidField   { get; } = 2 << 22;
     }
 }

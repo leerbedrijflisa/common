@@ -73,6 +73,21 @@ namespace Lisa.Common.UnitTests
             Assert.Equal("title", AnonymousField(error.Values, "Field"));
         }
 
+        [Fact]
+        public void ItReportsExtraFields()
+        {
+            var validator = new BookValidator();
+            dynamic book = new DynamicModel();
+            book.Rating = 5;
+
+            ValidationResult result = validator.Validate(book);
+            Assert.True(result.HasErrors);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.InvalidField, error.Code);
+            Assert.Equal("Rating", AnonymousField(error.Values, "Field"));
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -93,6 +108,7 @@ namespace Lisa.Common.UnitTests
         public override void ValidateModel()
         {
             Required("title");
+            Optional("author");
         }
     }
 
