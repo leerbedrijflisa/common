@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Lisa.Common.WebApi
 {
@@ -40,15 +41,15 @@ namespace Lisa.Common.WebApi
         public void Required(string fieldName)
         {
             var name = fieldName.ToLowerInvariant();
-
-            if (!_fields.ContainsKey(name))
+            var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == name);
+            if (field.Key == null)
             {
-                _fields[name] = false;
+                _fields[fieldName] = false;
             }
 
             if (Property.Key.ToLowerInvariant() == name)
             {
-                _fields[name] = true;
+                _fields[fieldName] = true;
             }
         }
 

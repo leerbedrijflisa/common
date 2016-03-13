@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Xunit;
+using System;
 
 namespace Lisa.Common.UnitTests
 {
@@ -28,9 +29,8 @@ namespace Lisa.Common.UnitTests
             Assert.True(result.HasErrors);
 
             var error = result.Errors.First();
-            dynamic values = error.Values;
             Assert.Equal(ErrorCode.FieldMissing, error.Code);
-            Assert.Equal("title", AnonymousField(values, "Field"));
+            Assert.Equal("title", AnonymousField(error.Values, "Field"));
         }
 
         [Fact]
@@ -42,6 +42,21 @@ namespace Lisa.Common.UnitTests
 
             ValidationResult result = validator.Validate(book);
             Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItPreserversCaseOfFieldInErrorValues()
+        {
+            var validator = new PersonValidator();
+            dynamic person = new DynamicModel();
+            person.FirstName = "Alexandre";
+
+            ValidationResult result = validator.Validate(person);
+            Assert.True(result.HasErrors);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.FieldMissing, error.Code);
+            Assert.Equal("lastName", AnonymousField(error.Values, "Field"));
         }
 
         private object AnonymousField(object obj, string fieldName)
@@ -64,6 +79,15 @@ namespace Lisa.Common.UnitTests
         public override void ValidateModel()
         {
             Required("title");
+        }
+    }
+
+    public class PersonValidator : Validator
+    {
+        public override void ValidateModel()
+        {
+            Required("firstName");
+            Required("lastName");
         }
     }
 }
