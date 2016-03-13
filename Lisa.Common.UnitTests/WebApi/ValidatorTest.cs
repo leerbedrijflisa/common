@@ -59,6 +59,20 @@ namespace Lisa.Common.UnitTests
             Assert.Equal("lastName", AnonymousField(error.Values, "Field"));
         }
 
+        [Fact]
+        public void ItChecksForRequiredFieldsOnAnEmptyModel()
+        {
+            var validator = new BookValidator();
+            dynamic book = new DynamicModel();
+
+            ValidationResult result = validator.Validate(book);
+            Assert.True(result.HasErrors);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.FieldMissing, error.Code);
+            Assert.Equal("title", AnonymousField(error.Values, "Field"));
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();

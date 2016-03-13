@@ -10,6 +10,10 @@ namespace Lisa.Common.WebApi
             Model = model;
             _fields = new Dictionary<string, bool>();
 
+            Property = new KeyValuePair<string, object>(string.Empty, null);
+            ValidateModel();
+            Result = new ValidationResult();
+
             foreach (var property in model.Properties)
             {
                 Property = property;
