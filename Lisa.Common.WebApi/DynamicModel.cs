@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
@@ -10,7 +11,7 @@ namespace Lisa.Common.WebApi
         {
             get
             {
-                var property = Properties.SingleOrDefault(p => p.Key.ToLowerInvariant() == name.ToLowerInvariant());
+                var property = Properties.SingleOrDefault(p => string.Equals(p.Key, name, StringComparison.OrdinalIgnoreCase));
                 if (property.Key == null)
                 {
                     throw new KeyNotFoundException($"A property with the name {name} does not exist.");
@@ -22,7 +23,7 @@ namespace Lisa.Common.WebApi
 
         public bool Contains(string name)
         {
-            return Properties.Any(p => p.Key.ToLowerInvariant() == name.ToLowerInvariant());
+            return Properties.Any(p => string.Equals(p.Key, name, StringComparison.OrdinalIgnoreCase));
         }
 
         public object GetMetadata()
@@ -37,8 +38,7 @@ namespace Lisa.Common.WebApi
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            var memberName = binder.Name.ToLowerInvariant();
-            var property = Properties.SingleOrDefault(p => p.Key.ToLowerInvariant() == memberName);
+            var property = Properties.SingleOrDefault(p => string.Equals(p.Key, binder.Name, StringComparison.OrdinalIgnoreCase));
             if (property.Key == null)
             {
                 return base.TryGetMember(binder, out result);

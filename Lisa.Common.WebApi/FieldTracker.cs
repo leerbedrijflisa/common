@@ -18,7 +18,7 @@ namespace Lisa.Common.WebApi
 
         public bool IsValid(string fieldName)
         {
-            return _fields.Any(f => f.Key.ToLowerInvariant() == fieldName.ToLowerInvariant());
+            return _fields.Any(f => string.Equals(f.Key, fieldName, StringComparison.OrdinalIgnoreCase));
         }
 
         public void MarkRequired(string fieldName)
@@ -46,7 +46,7 @@ namespace Lisa.Common.WebApi
 
         private KeyValuePair<string, FieldStatus> FindField(string fieldName)
         {
-            return _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == fieldName.ToLowerInvariant());
+            return _fields.SingleOrDefault(f => string.Equals(f.Key, fieldName, StringComparison.OrdinalIgnoreCase));
         }
 
         private Dictionary<string, FieldStatus> _fields = new Dictionary<string, FieldStatus>();

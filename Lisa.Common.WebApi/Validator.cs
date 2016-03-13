@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lisa.Common.WebApi
 {
@@ -57,7 +56,7 @@ namespace Lisa.Common.WebApi
         {
             _fieldTracker.MarkRequired(fieldName);
 
-            if (Property.Key.ToLowerInvariant() == fieldName.ToLowerInvariant())
+            if (string.Equals(Property.Key, fieldName, StringComparison.OrdinalIgnoreCase))
             {
                 _fieldTracker.MarkPresent(fieldName);
 
@@ -72,7 +71,7 @@ namespace Lisa.Common.WebApi
         {
             _fieldTracker.MarkOptional(fieldName);
 
-            if (Property.Key.ToLowerInvariant() == fieldName.ToLowerInvariant())
+            if (string.Equals(Property.Key, fieldName, StringComparison.OrdinalIgnoreCase))
             {
                 _fieldTracker.MarkPresent(fieldName);
 

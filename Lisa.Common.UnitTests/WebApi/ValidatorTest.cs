@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using Xunit;
-using System;
 
 namespace Lisa.Common.UnitTests
 {
