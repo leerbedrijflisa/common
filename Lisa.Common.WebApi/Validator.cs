@@ -9,7 +9,6 @@ namespace Lisa.Common.WebApi
         public ValidationResult Validate(DynamicModel model)
         {
             Model = model;
-            _fields = new Dictionary<string, FieldStatus>();
 
             Property = new KeyValuePair<string, object>(string.Empty, null);
             ValidateModel();
@@ -20,8 +19,7 @@ namespace Lisa.Common.WebApi
                 Property = property;
                 ValidateModel();
 
-                var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == property.Key.ToLowerInvariant());
-                if (field.Key == null)
+                if (!_fieldTracker.IsValid(property.Key))
                 {
                     var error = new Error
                     {
@@ -36,21 +34,18 @@ namespace Lisa.Common.WebApi
                 }
             }
 
-            foreach (var field in _fields)
+            foreach (var field in _fieldTracker.MissingFields)
             {
-                if (field.Value == FieldStatus.Required)
+                var error = new Error
                 {
-                    var error = new Error
+                    Code = ErrorCode.FieldMissing,
+                    Message = $"The field '{field}' is required.",
+                    Values =  new
                     {
-                        Code = ErrorCode.FieldMissing,
-                        Message = $"The field '{field.Key}' is required.",
-                        Values =  new
-                        {
-                            Field = field.Key
-                        }
-                    };
-                    Result.Errors.Add(error);
-                }
+                        Field = field
+                    }
+                };
+                Result.Errors.Add(error);
             }
 
             return Result;
@@ -60,16 +55,11 @@ namespace Lisa.Common.WebApi
 
         protected void Required(string fieldName, params Action<string, object>[] validationFunctions)
         {
-            var name = fieldName.ToLowerInvariant();
-            var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == name);
-            if (field.Key == null)
-            {
-                _fields[fieldName] = FieldStatus.Required;
-            }
+            _fieldTracker.MarkRequired(fieldName);
 
-            if (Property.Key.ToLowerInvariant() == name)
+            if (Property.Key.ToLowerInvariant() == fieldName.ToLowerInvariant())
             {
-                _fields[fieldName] = FieldStatus.Present;
+                _fieldTracker.MarkPresent(fieldName);
 
                 foreach (var validationFunction in validationFunctions)
                 {
@@ -80,16 +70,11 @@ namespace Lisa.Common.WebApi
 
         protected void Optional(string fieldName, params Action<string, object>[] validationFunctions)
         {
-            var name = fieldName.ToLowerInvariant();
-            var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == name);
-            if (field.Key == null)
-            {
-                _fields[fieldName] = FieldStatus.Optional;
-            }
+            _fieldTracker.MarkOptional(fieldName);
 
-            if (Property.Key.ToLowerInvariant() == name)
+            if (Property.Key.ToLowerInvariant() == fieldName.ToLowerInvariant())
             {
-                _fields[fieldName] = FieldStatus.Present;
+                _fieldTracker.MarkPresent(fieldName);
 
                 foreach (var validationFunction in validationFunctions)
                 {
@@ -120,6 +105,6 @@ namespace Lisa.Common.WebApi
         protected DynamicModel Model { get; private set; }
         protected KeyValuePair<string, object> Property { get; private set; }
 
-        private Dictionary<string, FieldStatus> _fields;
+        private FieldTracker _fieldTracker = new FieldTracker();
     }
 }
