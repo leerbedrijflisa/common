@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lisa.Common.WebApi
 {
-    public abstract class Validator
+    public abstract partial class Validator
     {
         public ValidationResult Validate(DynamicModel model)
         {
@@ -79,25 +79,6 @@ namespace Lisa.Common.WebApi
         {
             _fieldTracker.MarkOptional(fieldName);
             ValidateField(fieldName, validationFunctions);
-        }
-
-
-        protected void NotEmpty(string fieldName, object value)
-        {
-            if ((value == null) ||
-                (value is string) && (string.IsNullOrWhiteSpace((string) value)))
-            {
-                var error = new Error
-                {
-                    Code = ErrorCode.EmptyValue,
-                    Message = $"The field '{fieldName}' should not be empty.",
-                    Values = new
-                    {
-                        Field = fieldName
-                    }
-                };
-                Result.Errors.Add(error);
-            }
         }
 
         private void ValidateField(string fieldName, Action<string, object>[] validationFunctions)
