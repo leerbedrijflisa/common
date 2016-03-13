@@ -7,14 +7,25 @@ namespace Lisa.Common.WebApi
     {
         public ValidationResult Validate(DynamicModel model)
         {
+            // Make the model available to all validation functions, so that we don't have to pass
+            // it around all the time. This makes derived validators easier to write and read.
             Model = model;
 
+            // Validate the model with a dummy property. If we don't, a model without properties
+            // never gets validated, its fields will never be marked optional or required, and it
+            // becomes impossible to report invalid fields.
             Property = new KeyValuePair<string, object>(string.Empty, null);
             ValidateModel();
+
+            // Throw away any validation errors that resulted from validating the model with a
+            // dummy property.
             Result = new ValidationResult();
 
             foreach (var property in model.Properties)
             {
+                // Make the property available to all validation functions, so that we don't have
+                // to pass it around all the time. This makes derived validators easier to write
+                // and read.
                 Property = property;
                 ValidateModel();
 
