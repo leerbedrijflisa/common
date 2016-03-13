@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lisa.Common.WebApi
@@ -57,7 +58,7 @@ namespace Lisa.Common.WebApi
 
         public abstract void ValidateModel();
 
-        public void Required(string fieldName)
+        protected void Required(string fieldName, params Action<string, object>[] validationFunctions)
         {
             var name = fieldName.ToLowerInvariant();
             var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == name);
@@ -69,10 +70,15 @@ namespace Lisa.Common.WebApi
             if (Property.Key.ToLowerInvariant() == name)
             {
                 _fields[fieldName] = FieldStatus.Present;
+
+                foreach (var validationFunction in validationFunctions)
+                {
+                    validationFunction(Property.Key, Property.Value);
+                }
             }
         }
 
-        public void Optional(string fieldName)
+        protected void Optional(string fieldName, params Action<string, object>[] validationFunctions)
         {
             var name = fieldName.ToLowerInvariant();
             var field = _fields.SingleOrDefault(f => f.Key.ToLowerInvariant() == name);
@@ -84,6 +90,29 @@ namespace Lisa.Common.WebApi
             if (Property.Key.ToLowerInvariant() == name)
             {
                 _fields[fieldName] = FieldStatus.Present;
+
+                foreach (var validationFunction in validationFunctions)
+                {
+                    validationFunction(Property.Key, Property.Value);
+                }
+            }
+        }
+
+        protected void NotEmpty(string fieldName, object value)
+        {
+            if ((value == null) ||
+                (value is string) && (string.IsNullOrWhiteSpace((string) value)))
+            {
+                var error = new Error
+                {
+                    Code = ErrorCode.EmptyValue,
+                    Message = $"The field '{fieldName}' should not be empty.",
+                    Values = new
+                    {
+                        Field = fieldName
+                    }
+                };
+                Result.Errors.Add(error);
             }
         }
 

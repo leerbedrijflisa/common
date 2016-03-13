@@ -27,6 +27,7 @@ namespace Lisa.Common.UnitTests
 
             ValidationResult result = validator.Validate(book);
             Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.FieldMissing, error.Code);
@@ -53,6 +54,7 @@ namespace Lisa.Common.UnitTests
 
             ValidationResult result = validator.Validate(person);
             Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.FieldMissing, error.Code);
@@ -67,6 +69,7 @@ namespace Lisa.Common.UnitTests
 
             ValidationResult result = validator.Validate(book);
             Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.FieldMissing, error.Code);
@@ -78,14 +81,49 @@ namespace Lisa.Common.UnitTests
         {
             var validator = new BookValidator();
             dynamic book = new DynamicModel();
+            book.Title = "The Count of Monte-Cristo";
             book.Rating = 5;
 
             ValidationResult result = validator.Validate(book);
             Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.InvalidField, error.Code);
             Assert.Equal("Rating", AnonymousField(error.Values, "Field"));
+        }
+
+        [Fact]
+        public void ItRunsValidationFunctionsOnRequiredFields()
+        {
+            var validator = new BookValidator();
+            dynamic book = new DynamicModel();
+            book.Title = string.Empty;
+
+            ValidationResult result = validator.Validate(book);
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.EmptyValue, error.Code);
+            Assert.Equal("Title", AnonymousField(error.Values, "Field"));
+        }
+
+        [Fact]
+        public void ItRunsValidationFunctionsOnOptionalFields()
+        {
+            var validator = new BookValidator();
+            dynamic book = new DynamicModel();
+            book.Title = "The Count of Monte-Cristo";
+            book.Author = string.Empty;
+
+            ValidationResult result = validator.Validate(book);
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.EmptyValue, error.Code);
+            Assert.Equal("Author", AnonymousField(error.Values, "Field"));
         }
 
         private object AnonymousField(object obj, string fieldName)
@@ -107,8 +145,8 @@ namespace Lisa.Common.UnitTests
     {
         public override void ValidateModel()
         {
-            Required("title");
-            Optional("author");
+            Required("title", NotEmpty);
+            Optional("author", NotEmpty);
         }
     }
 
