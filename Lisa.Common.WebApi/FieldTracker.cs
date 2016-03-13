@@ -28,6 +28,10 @@ namespace Lisa.Common.WebApi
             {
                 _fields[fieldName] = FieldStatus.Required;
             }
+            else if (field.Value == FieldStatus.Optional)
+            {
+                throw new InvalidOperationException($"Cannot mark field '{fieldName}' as required, because it is already marked as optional.");
+            }
         }
 
         public void MarkOptional(string fieldName)
@@ -36,6 +40,10 @@ namespace Lisa.Common.WebApi
             if (field.Key == null)
             {
                 _fields[fieldName] = FieldStatus.Optional;
+            }
+            else if (field.Value == FieldStatus.Required)
+            {
+                throw new InvalidOperationException($"Cannot mark field '{fieldName}' as optional, because it is already marked as required.");
             }
         }
 

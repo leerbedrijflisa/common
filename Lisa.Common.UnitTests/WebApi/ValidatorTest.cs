@@ -1,4 +1,5 @@
 ﻿using Lisa.Common.WebApi;
+using System;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -125,6 +126,24 @@ namespace Lisa.Common.UnitTests
             Assert.Equal("Author", AnonymousField(error.Values, "Field"));
         }
 
+        [Fact]
+        public void ItThrowsWhenAnOptionalFieldGetsMarkedRequired()
+        {
+            var validator = new ParadoxValidator();
+            var paradox = new DynamicModel();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(paradox));
+        }
+
+        [Fact]
+        public void ItThrowsWhenARequiredFieldGetsMarkedOptional()
+        {
+            var validator = new ContradictionValidator();
+            var contradiction = new DynamicModel();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(contradiction));
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -155,6 +174,24 @@ namespace Lisa.Common.UnitTests
         {
             Required("firstName");
             Required("lastName");
+        }
+    }
+
+    public class ParadoxValidator : Validator
+    {
+        public override void ValidateModel()
+        {
+            Optional("truth");
+            Required("truth");
+        }
+    }
+
+    public class ContradictionValidator : Validator
+    {
+        public override void ValidateModel()
+        {
+            Required("fact");
+            Optional("fact");
         }
     }
 }
