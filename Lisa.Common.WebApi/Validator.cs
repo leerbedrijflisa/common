@@ -52,35 +52,22 @@ namespace Lisa.Common.WebApi
 
         public abstract void ValidateModel();
 
+        protected ValidationResult Result { get; private set; } = new ValidationResult();
+        protected DynamicModel Model { get; private set; }
+        protected KeyValuePair<string, object> Property { get; private set; }
+
         protected void Required(string fieldName, params Action<string, object>[] validationFunctions)
         {
             _fieldTracker.MarkRequired(fieldName);
-
-            if (string.Equals(Property.Key, fieldName, StringComparison.OrdinalIgnoreCase))
-            {
-                _fieldTracker.MarkPresent(fieldName);
-
-                foreach (var validationFunction in validationFunctions)
-                {
-                    validationFunction(Property.Key, Property.Value);
-                }
-            }
+            ValidateField(fieldName, validationFunctions);
         }
 
         protected void Optional(string fieldName, params Action<string, object>[] validationFunctions)
         {
             _fieldTracker.MarkOptional(fieldName);
-
-            if (string.Equals(Property.Key, fieldName, StringComparison.OrdinalIgnoreCase))
-            {
-                _fieldTracker.MarkPresent(fieldName);
-
-                foreach (var validationFunction in validationFunctions)
-                {
-                    validationFunction(Property.Key, Property.Value);
-                }
-            }
+            ValidateField(fieldName, validationFunctions);
         }
+
 
         protected void NotEmpty(string fieldName, object value)
         {
@@ -100,9 +87,18 @@ namespace Lisa.Common.WebApi
             }
         }
 
-        protected ValidationResult Result { get; private set; } = new ValidationResult();
-        protected DynamicModel Model { get; private set; }
-        protected KeyValuePair<string, object> Property { get; private set; }
+        private void ValidateField(string fieldName, Action<string, object>[] validationFunctions)
+        {
+            if (string.Equals(Property.Key, fieldName, StringComparison.OrdinalIgnoreCase))
+            {
+                _fieldTracker.MarkPresent(fieldName);
+
+                foreach (var validationFunction in validationFunctions)
+                {
+                    validationFunction(Property.Key, Property.Value);
+                }
+            }
+        }
 
         private FieldTracker _fieldTracker = new FieldTracker();
     }
