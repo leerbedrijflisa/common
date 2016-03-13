@@ -28,6 +28,9 @@ namespace Lisa.Common.WebApi
             {
                 _fields[fieldName] = FieldStatus.Required;
             }
+            // This check works because the validator runs all validations with a dummy property
+            // first. In that first pass, fields never get marked as present and this check relies
+            // on that fact.
             else if (field.Value == FieldStatus.Optional)
             {
                 throw new InvalidOperationException($"Cannot mark field '{fieldName}' as required, because it is already marked as optional.");
@@ -41,6 +44,9 @@ namespace Lisa.Common.WebApi
             {
                 _fields[fieldName] = FieldStatus.Optional;
             }
+            // This check works because the validator runs all validations with a dummy property
+            // first. In that first pass, fields never get marked as present and this check relies
+            // on that fact.
             else if (field.Value == FieldStatus.Required)
             {
                 throw new InvalidOperationException($"Cannot mark field '{fieldName}' as optional, because it is already marked as required.");
