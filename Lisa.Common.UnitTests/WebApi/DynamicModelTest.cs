@@ -65,7 +65,7 @@ namespace Lisa.Common.UnitTests
         }
 
         [Fact]
-        public void ItProvidesAccessToPropertiesThroughAnIndexer()
+        public void ItProvidesReadAccessToPropertiesThroughAnIndexer()
         {
             dynamic model = new DynamicModel();
             model.Foo = "bar";
@@ -107,6 +107,26 @@ namespace Lisa.Common.UnitTests
             model.Foo = "bar";
 
             Assert.True(model.Contains("fOO"));
+        }
+
+        [Fact]
+        public void ItProvidesWriteAccessToPropertiesThroughAnIndexer()
+        {
+            dynamic model = new DynamicModel();
+            model.Foo = "bar";
+            model["Foo"] = "baz";
+
+            Assert.Equal("baz", model.Foo);
+        }
+
+        [Fact]
+        public void ItPreservesCaseOfThePropertyNameWhenWritingThroughAnIndexer()
+        {
+            dynamic model = new DynamicModel();
+            model.Foo = "bar";
+            model["foo"] = "baz";
+
+            Assert.Equal("baz", model.Foo);
         }
     }
 }

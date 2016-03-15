@@ -19,6 +19,16 @@ namespace Lisa.Common.WebApi
 
                 return property.Value;
             }
+            set
+            {
+                var property = Properties.SingleOrDefault(p => string.Equals(p.Key, name, StringComparison.OrdinalIgnoreCase));
+                if (property.Key == null)
+                {
+                    throw new KeyNotFoundException($"A property with the name {name} does not exist.");
+                }
+
+                Properties[property.Key] = value;
+            }
         }
 
         public bool Contains(string name)
