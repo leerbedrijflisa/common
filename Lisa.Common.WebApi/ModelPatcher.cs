@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Lisa.Common.WebApi
 {
@@ -8,7 +9,15 @@ namespace Lisa.Common.WebApi
         {
             foreach (var patch in patches)
             {
-                model[patch.Field] = patch.Value;
+                switch (patch.Action.ToLowerInvariant())
+                {
+                    case "replace":
+                        model[patch.Field] = patch.Value;
+                        break;
+
+                    default:
+                        throw new ArgumentException($"'{patch.Action}' is not a valid patch action.");
+                }
             }
         }
     }
