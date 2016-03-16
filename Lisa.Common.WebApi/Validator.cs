@@ -35,7 +35,7 @@ namespace Lisa.Common.WebApi
                 {
                     var error = new Error
                     {
-                        Code = ErrorCode.InvalidField,
+                        Code = ErrorCode.ExtraField,
                         Message = $"'{property.Key}' is not a valid field.",
                         Values = new
                         {
@@ -61,6 +61,46 @@ namespace Lisa.Common.WebApi
             }
 
             return Result;
+        }
+
+        public ValidationResult Validate(IEnumerable<Patch> patches, DynamicModel model)
+        {
+            var result = new ValidationResult();
+
+            foreach (var patch in patches)
+            {
+                if (!_validPatchActions.Contains(patch.Action))
+                {
+                    var error = new Error
+                    {
+                        Code = ErrorCode.InvalidAction,
+                        Message = $"'{patch.Action}' is not a valid patch action.",
+                        Values = new
+                        {
+                            Action = patch.Action
+                        }
+                    };
+
+                    result.Errors.Add(error);
+                }
+
+                if (!model.Contains(patch.Field))
+                {
+                    var error = new Error
+                    {
+                        Code = ErrorCode.InvalidField,
+                        Message = $"'{patch.Field}' is not a valid field.",
+                        Values = new
+                        {
+                            Field = patch.Field
+                        }
+                    };
+
+                    result.Errors.Add(error);
+                }
+            }
+
+            return result;
         }
 
         public abstract void ValidateModel();
@@ -95,5 +135,6 @@ namespace Lisa.Common.WebApi
         }
 
         private FieldTracker _fieldTracker = new FieldTracker();
+        private readonly List<string> _validPatchActions = new List<string> { "replace" };
     }
 }

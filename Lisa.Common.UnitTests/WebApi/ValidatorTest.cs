@@ -89,7 +89,7 @@ namespace Lisa.Common.UnitTests
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            Assert.Equal(ErrorCode.InvalidField, error.Code);
+            Assert.Equal(ErrorCode.ExtraField, error.Code);
             Assert.Equal("Rating", AnonymousField(error.Values, "Field"));
         }
 

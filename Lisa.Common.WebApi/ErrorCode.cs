@@ -12,8 +12,13 @@
     //    load the values from a text file, we can do that without causing a breaking change.
     public static class ErrorCode
     {
-        public static int FieldMissing { get; } = 1 << 22;
-        public static int InvalidField { get; } = 2 << 22;
-        public static int EmptyValue   { get; } = 3 << 22;
+        // Model validation errors
+        public static int FieldMissing  { get; } = 0x0001 << 15;
+        public static int ExtraField    { get; } = 0x0002 << 15;
+        public static int EmptyValue    { get; } = 0x0003 << 15;
+
+        // Patch validation errors
+        public static int InvalidAction { get; } = 0x0100 << 15;
+        public static int InvalidField  { get; } = 0x0200 << 15;
     }
 }
