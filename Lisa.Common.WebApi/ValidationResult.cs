@@ -10,6 +10,12 @@ namespace Lisa.Common.WebApi
             get { return Errors.Count > 0; }
         }
 
-        public ICollection<Error> Errors { get; set; } = new List<Error>();
+        public ICollection<Error> Errors { get; } = new List<Error>();
+
+        internal void Merge(ValidationResult other)
+        {
+            List<Error> errors = (List<Error>) Errors;
+            errors.AddRange(other.Errors);
+        }
     }
 }

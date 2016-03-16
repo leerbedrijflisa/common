@@ -66,9 +66,12 @@ namespace Lisa.Common.WebApi
         public ValidationResult Validate(IEnumerable<Patch> patches, DynamicModel model)
         {
             var result = new ValidationResult();
+            List<Patch> validPatches = new List<Patch>();
 
             foreach (var patch in patches)
             {
+                bool isValid = true;
+
                 if (!_validPatchActions.Contains(patch.Action))
                 {
                     var error = new Error
@@ -82,6 +85,7 @@ namespace Lisa.Common.WebApi
                     };
 
                     result.Errors.Add(error);
+                    isValid = false;
                 }
 
                 if (!model.Contains(patch.Field))
@@ -97,9 +101,20 @@ namespace Lisa.Common.WebApi
                     };
 
                     result.Errors.Add(error);
+                    isValid = false;
+                }
+
+                if (isValid)
+                {
+                    validPatches.Add(patch);
                 }
             }
 
+            var patcher = new ModelPatcher();
+            patcher.Apply(validPatches, model);
+            Validate(model);
+
+            result.Merge(Result);
             return result;
         }
 
