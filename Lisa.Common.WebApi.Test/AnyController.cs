@@ -26,7 +26,7 @@ namespace Lisa.Common.WebApi.Test
 
     public class AnyValidator : Validator
     {
-        public override void ValidateModel()
+        protected override void ValidateModel()
         {
             Required("something");
         }

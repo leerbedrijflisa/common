@@ -18,7 +18,8 @@
         public static int EmptyValue    { get; } = 0x0003 << 15;
 
         // Patch validation errors
-        public static int InvalidAction { get; } = 0x0100 << 15;
-        public static int InvalidField  { get; } = 0x0200 << 15;
+        public static int InvalidAction   { get; } = 0x0100 << 15;
+        public static int InvalidField    { get; } = 0x0200 << 15;
+        public static int PatchNotAllowed { get; } = 0x0300 << 15;
     }
 }

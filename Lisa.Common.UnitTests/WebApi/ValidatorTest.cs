@@ -154,23 +154,28 @@ namespace Lisa.Common.UnitTests
 
     public class EmptyValidator : Validator
     {
-        public override void ValidateModel()
+        protected override void ValidateModel()
         {
         }
     }
 
     public class BookValidator : Validator
     {
-        public override void ValidateModel()
+        protected override void ValidateModel()
         {
             Required("title", NotEmpty);
             Optional("author", NotEmpty);
+        }
+
+        protected override void ValidatePatch()
+        {
+            Allow("title");
         }
     }
 
     public class PersonValidator : Validator
     {
-        public override void ValidateModel()
+        protected override void ValidateModel()
         {
             Required("firstName");
             Required("lastName");
@@ -179,7 +184,7 @@ namespace Lisa.Common.UnitTests
 
     public class ParadoxValidator : Validator
     {
-        public override void ValidateModel()
+        protected override void ValidateModel()
         {
             Optional("truth");
             Required("truth");
@@ -188,7 +193,7 @@ namespace Lisa.Common.UnitTests
 
     public class ContradictionValidator : Validator
     {
-        public override void ValidateModel()
+        protected override void ValidateModel()
         {
             Required("fact");
             Optional("fact");

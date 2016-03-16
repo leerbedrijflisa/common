@@ -161,6 +161,31 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal("Magician", model.Title);
         }
 
+        [Fact]
+        public void ItReportsWhenPatchingAFieldThatIsNotAllowedToBePatched()
+        {
+            dynamic model = new DynamicModel();
+            model.Title = "A Clockwork Orange";
+            model.Author = "Anthony Burgess";
+
+            var patch = new Patch
+            {
+                Action = "replace",
+                Field = "author",
+                Value = "Stanley Kubrick"
+            };
+
+            var validator = new BookValidator();
+            ValidationResult result = validator.Validate(new Patch[] { patch }, model);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.PatchNotAllowed, error.Code);
+            Assert.Equal("Anthony Burgess", model.Author);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();

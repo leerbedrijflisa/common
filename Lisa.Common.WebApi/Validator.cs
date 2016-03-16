@@ -108,6 +108,29 @@ namespace Lisa.Common.WebApi
 
                 if (isValid)
                 {
+                    Patch = patch;
+                    _allowPatch = false;
+                    ValidatePatch();
+
+                    if (!_allowPatch)
+                    {
+                        var error = new Error
+                        {
+                            Code = ErrorCode.PatchNotAllowed,
+                            Message = $"The field '{patch.Field}' is not patchable.",
+                            Values = new
+                            {
+                                Field = patch.Field
+                            }
+                        };
+
+                        result.Errors.Add(error);
+                        isValid = false;
+                    }
+                }
+
+                if (isValid)
+                {
                     validPatches.Add(patch);
                 }
             }
@@ -120,11 +143,13 @@ namespace Lisa.Common.WebApi
             return result;
         }
 
-        public abstract void ValidateModel();
+        protected abstract void ValidateModel();
+        protected virtual void ValidatePatch() { }
 
         protected ValidationResult Result { get; private set; } = new ValidationResult();
         protected DynamicModel Model { get; private set; }
         protected KeyValuePair<string, object> Property { get; private set; }
+        protected Patch Patch { get; private set; }
 
         protected void Required(string fieldName, params Action<string, object>[] validationFunctions)
         {
@@ -136,6 +161,14 @@ namespace Lisa.Common.WebApi
         {
             _fieldTracker.MarkOptional(fieldName);
             ValidateField(fieldName, validationFunctions);
+        }
+
+        protected void Allow(string fieldName)
+        {
+            if (Patch.Field.ToLowerInvariant() == fieldName.ToLowerInvariant())
+            {
+                _allowPatch = true;
+            }
         }
 
         private void ValidateField(string fieldName, Action<string, object>[] validationFunctions)
@@ -163,6 +196,7 @@ namespace Lisa.Common.WebApi
             Result = resultBackup;
         }
 
+        private bool _allowPatch;
         private FieldTracker _fieldTracker = new FieldTracker();
         private readonly List<string> _validPatchActions = new List<string> { "replace" };
     }
