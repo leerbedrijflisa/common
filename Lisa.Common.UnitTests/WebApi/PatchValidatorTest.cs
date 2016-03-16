@@ -142,6 +142,25 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal("Title", AnonymousField(error.Values, "Field"));
         }
 
+        [Fact]
+        public void ItCanReplaceAMissingField()
+        {
+            dynamic model = new DynamicModel();
+
+            var patch = new Patch
+            {
+                Action = "replace",
+                Field = "title",
+                Value = "Magician"
+            };
+
+            var validator = new BookValidator();
+            ValidationResult result = validator.Validate(new Patch[] { patch }, model);
+
+            Assert.False(result.HasErrors);
+            Assert.Equal("Magician", model.Title);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();

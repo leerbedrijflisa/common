@@ -128,5 +128,14 @@ namespace Lisa.Common.UnitTests
 
             Assert.Equal("baz", model.Foo);
         }
+
+        [Fact]
+        public void ItAddsAPropertyWhenUsingTheIndexer()
+        {
+            dynamic model = new DynamicModel();
+            model["Foo"] = "bar";
+
+            Assert.Equal("bar", model.Foo);
+        }
     }
 }

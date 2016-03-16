@@ -16,7 +16,7 @@ namespace Lisa.Common.WebApi
             }
         }
 
-        public bool IsValid(string fieldName)
+        public bool Exists(string fieldName)
         {
             return _fields.Any(f => string.Equals(f.Key, fieldName, StringComparison.OrdinalIgnoreCase));
         }

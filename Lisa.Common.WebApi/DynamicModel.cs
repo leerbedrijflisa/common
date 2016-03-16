@@ -22,12 +22,15 @@ namespace Lisa.Common.WebApi
             set
             {
                 var property = Properties.SingleOrDefault(p => string.Equals(p.Key, name, StringComparison.OrdinalIgnoreCase));
+
                 if (property.Key == null)
                 {
-                    throw new KeyNotFoundException($"A property with the name {name} does not exist.");
+                    Properties.Add(name, value);
                 }
-
-                Properties[property.Key] = value;
+                else
+                {
+                    Properties[property.Key] = value;
+                }
             }
         }
 

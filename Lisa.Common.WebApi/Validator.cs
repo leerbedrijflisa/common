@@ -31,7 +31,7 @@ namespace Lisa.Common.WebApi
                 Property = property;
                 ValidateModel();
 
-                if (!_fieldTracker.IsValid(property.Key))
+                if (!_fieldTracker.Exists(property.Key))
                 {
                     var error = new Error
                     {
@@ -68,6 +68,8 @@ namespace Lisa.Common.WebApi
             var result = new ValidationResult();
             List<Patch> validPatches = new List<Patch>();
 
+            GatherFieldInfo();
+
             foreach (var patch in patches)
             {
                 bool isValid = true;
@@ -88,7 +90,7 @@ namespace Lisa.Common.WebApi
                     isValid = false;
                 }
 
-                if (!model.Contains(patch.Field))
+                if (!_fieldTracker.Exists(patch.Field))
                 {
                     var error = new Error
                     {
@@ -147,6 +149,18 @@ namespace Lisa.Common.WebApi
                     validationFunction(Property.Key, Property.Value);
                 }
             }
+        }
+
+        private void GatherFieldInfo()
+        {
+            var resultBackup = Result;
+            Result = new ValidationResult();
+
+            Model = new DynamicModel();
+            Property = new KeyValuePair<string, object>(string.Empty, null);
+            ValidateModel();
+
+            Result = resultBackup;
         }
 
         private FieldTracker _fieldTracker = new FieldTracker();
