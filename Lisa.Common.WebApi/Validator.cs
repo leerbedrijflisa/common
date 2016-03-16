@@ -63,7 +63,7 @@ namespace Lisa.Common.WebApi
             return Result;
         }
 
-        public abstract void ValidateModel();
+        protected abstract void ValidateModel();
 
         protected ValidationResult Result { get; private set; } = new ValidationResult();
         protected DynamicModel Model { get; private set; }
