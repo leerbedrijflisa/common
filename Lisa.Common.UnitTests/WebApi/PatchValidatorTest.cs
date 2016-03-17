@@ -115,7 +115,7 @@ namespace Lisa.Common.UnitTests.WebApi
             ValidationResult result = validator.Validate(new Patch[] { patch }, model);
 
             Assert.False(result.HasErrors);
-            Assert.Equal("Magician", model.Title);
+            Assert.Equal("A Clockwork Orange", model.Title);
         }
 
         [Fact]
@@ -158,7 +158,10 @@ namespace Lisa.Common.UnitTests.WebApi
             ValidationResult result = validator.Validate(new Patch[] { patch }, model);
 
             Assert.False(result.HasErrors);
-            Assert.Equal("Magician", model.Title);
+
+            // NOTE: The model still doesn't have a title, because the validator doesn't change
+            // the model. It does validate the model as if the patches were applied, though, and
+            // that's why it reports no errors here.
         }
 
         [Fact]

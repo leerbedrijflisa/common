@@ -23,10 +23,15 @@ namespace Lisa.Common.WebApi
             _context = fieldInfoContext;
             _context.Validate(this);
 
-            _context = new PatchValidationContext(model, patches, fieldInfoContext.FieldTracker);
+            var patchValidationContext = new PatchValidationContext(model, patches, fieldInfoContext.FieldTracker);
+            _context = patchValidationContext;
             _context.Validate(this);
 
-            _context = new ModelValidationContext(model, fieldInfoContext.FieldTracker, Result);
+            var copy = model.Copy();
+            var patcher = new ModelPatcher();
+            patcher.Apply(patchValidationContext.ValidPatches, copy);
+
+            _context = new ModelValidationContext(copy, fieldInfoContext.FieldTracker, Result);
             _context.Validate(this);
 
             return Result;

@@ -7,6 +7,10 @@ namespace Lisa.Common.WebApi
 {
     public class DynamicModel : DynamicObject
     {
+        public DynamicModel()
+        {
+        }
+
         public object this[string name]
         {
             get
@@ -73,6 +77,21 @@ namespace Lisa.Common.WebApi
         }
 
         internal IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+
+        // Only copies the properties and not the metadata, because that's enough for the
+        // validator. And because I don't know how to make a deep copy of an arbitrary object.
+        internal DynamicModel Copy()
+        {
+            return new DynamicModel(Properties);
+        }
+
+        private DynamicModel(IDictionary<string, object> properties)
+        {
+            foreach (var property in properties)
+            {
+                Properties.Add(property.Key, property.Value);
+            }
+        }
 
         private object _metadata;
     }

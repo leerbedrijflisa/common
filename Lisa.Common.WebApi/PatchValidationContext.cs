@@ -13,10 +13,13 @@ namespace Lisa.Common.WebApi
             _fieldTracker = fieldTracker;
         }
 
+        public IEnumerable<Patch> ValidPatches
+        {
+            get { return _validPatches; }
+        }
+
         public override void Validate(Validator validator)
         {
-            List<Patch> validPatches = new List<Patch>();
-
             foreach (var patch in _patches)
             {
                 bool isValid = true;
@@ -44,12 +47,9 @@ namespace Lisa.Common.WebApi
 
                 if (isValid)
                 {
-                    validPatches.Add(patch);
+                    _validPatches.Add(patch);
                 }
             }
-
-            var patcher = new ModelPatcher();
-            patcher.Apply(validPatches, Model);
         }
 
         public override void Allow(string fieldName)
@@ -83,6 +83,7 @@ namespace Lisa.Common.WebApi
         }
 
         private IEnumerable<Patch> _patches;
+        private List<Patch> _validPatches = new List<Patch>();
         private FieldTracker _fieldTracker;
         private readonly List<string> _validPatchActions = new List<string> { "replace" };
     }
