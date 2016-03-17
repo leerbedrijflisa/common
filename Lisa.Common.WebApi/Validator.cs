@@ -7,156 +7,67 @@ namespace Lisa.Common.WebApi
     {
         public ValidationResult Validate(DynamicModel model)
         {
-            GatherFieldInfo();
+            var fieldInfoContext = new FieldInfoValidationContext();
+            _context = fieldInfoContext;
+            _context.Validate(this);
 
-            // Make the model available to all validation functions, so that we don't have to pass
-            // it around all the time. This makes derived validators easier to write and read.
-            Model = model;
-
-            foreach (var property in model.Properties)
-            {
-                // Make the property available to all validation functions, so that we don't have
-                // to pass it around all the time. This makes derived validators easier to write
-                // and read.
-                Property = property;
-                ValidateModel();
-
-                if (!_fieldTracker.Exists(property.Key))
-                {
-                    var error = new Error
-                    {
-                        Code = ErrorCode.ExtraField,
-                        Message = $"'{property.Key}' is not a valid field.",
-                        Values = new
-                        {
-                            Field = property.Key
-                        }
-                    };
-                    Result.Errors.Add(error);
-                }
-            }
-
-            foreach (var field in _fieldTracker.MissingFields)
-            {
-                var error = new Error
-                {
-                    Code = ErrorCode.FieldMissing,
-                    Message = $"The field '{field}' is required.",
-                    Values =  new
-                    {
-                        Field = field
-                    }
-                };
-                Result.Errors.Add(error);
-            }
+            _context = new ModelValidationContext(model, fieldInfoContext.FieldTracker);
+            _context.Validate(this);
 
             return Result;
         }
 
         public ValidationResult Validate(IEnumerable<Patch> patches, DynamicModel model)
         {
-            List<Patch> validPatches = new List<Patch>();
+            var fieldInfoContext = new FieldInfoValidationContext();
+            _context = fieldInfoContext;
+            _context.Validate(this);
 
-            GatherFieldInfo();
+            _context = new PatchValidationContext(model, patches, fieldInfoContext.FieldTracker);
+            _context.Validate(this);
 
-            foreach (var patch in patches)
-            {
-                bool isValid = true;
-
-                if (!_validPatchActions.Contains(patch.Action))
-                {
-                    var error = new Error
-                    {
-                        Code = ErrorCode.InvalidAction,
-                        Message = $"'{patch.Action}' is not a valid patch action.",
-                        Values = new
-                        {
-                            Action = patch.Action
-                        }
-                    };
-
-                    Result.Errors.Add(error);
-                    isValid = false;
-                }
-
-                if (!_fieldTracker.Exists(patch.Field))
-                {
-                    var error = new Error
-                    {
-                        Code = ErrorCode.InvalidField,
-                        Message = $"'{patch.Field}' is not a valid field.",
-                        Values = new
-                        {
-                            Field = patch.Field
-                        }
-                    };
-
-                    Result.Errors.Add(error);
-                    isValid = false;
-                }
-
-                if (isValid)
-                {
-                    Patch = patch;
-                    _allowPatch = false;
-                    ValidatePatch();
-
-                    if (!_allowPatch)
-                    {
-                        var error = new Error
-                        {
-                            Code = ErrorCode.PatchNotAllowed,
-                            Message = $"The field '{patch.Field}' is not patchable.",
-                            Values = new
-                            {
-                                Field = patch.Field
-                            }
-                        };
-
-                        Result.Errors.Add(error);
-                        isValid = false;
-                    }
-                }
-
-                if (isValid)
-                {
-                    validPatches.Add(patch);
-                }
-            }
-
-            var patcher = new ModelPatcher();
-            patcher.Apply(validPatches, model);
-            Validate(model);
+            _context = new ModelValidationContext(model, fieldInfoContext.FieldTracker, Result);
+            _context.Validate(this);
 
             return Result;
         }
 
-        protected abstract void ValidateModel();
-        protected virtual void ValidatePatch() { }
+        protected internal abstract void ValidateModel();
+        protected internal virtual void ValidatePatch() { }
 
-        protected ValidationResult Result { get; private set; } = new ValidationResult();
-        protected DynamicModel Model { get; private set; }
-        protected KeyValuePair<string, object> Property { get; private set; }
-        protected Patch Patch { get; private set; }
+        protected ValidationResult Result
+        {
+            get { return _context.Result; }
+        }
+
+        protected DynamicModel Model
+        {
+            get { return _context.Model; }
+        }
+
+        protected KeyValuePair<string, object> Property
+        {
+            get { return _context.Property; }
+        }
+
+        protected Patch Patch
+        {
+            get { return _context.Patch; }
+        }
 
         protected void Required(string fieldName, params Action<string, object>[] validationFunctions)
         {
-            _fieldTracker.MarkRequired(fieldName);
-            ValidateField(fieldName, validationFunctions);
+            _context.Required(fieldName, validationFunctions);
         }
 
         protected void Optional(string fieldName, params Action<string, object>[] validationFunctions)
         {
-            _fieldTracker.MarkOptional(fieldName);
-            ValidateField(fieldName, validationFunctions);
+            _context.Optional(fieldName, validationFunctions);
         }
 
         protected void Allow(string fieldName)
         {
-            if (Patch.Field.ToLowerInvariant() == fieldName.ToLowerInvariant())
-            {
-                _allowPatch = true;
-            }
+            _context.Allow(fieldName);
         }
 
         private void ValidateField(string fieldName, Action<string, object>[] validationFunctions)
@@ -181,17 +92,17 @@ namespace Lisa.Common.WebApi
             // a field is marked as both required and optional.
 
             var resultBackup = Result;
-            Result = new ValidationResult();
+            //Result = new ValidationResult();
 
-            Model = new DynamicModel();
-            Property = new KeyValuePair<string, object>(string.Empty, null);
-            ValidateModel();
+            //Model = new DynamicModel();
+            //Property = new KeyValuePair<string, object>(string.Empty, null);
+            //ValidateModel();
 
-            Result = resultBackup;
+            //Result = resultBackup;
         }
 
         private bool _allowPatch;
         private FieldTracker _fieldTracker = new FieldTracker();
-        private readonly List<string> _validPatchActions = new List<string> { "replace" };
+        private ValidationContext _context;
     }
 }
