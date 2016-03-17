@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 namespace Lisa.Common.WebApi
 {
+    // The validator works in different contexts, because each context requires different behavior
+    // when validating. The FieldInfoContext is only interested in gathering information about
+    // whether a field is optional or required, so it doesn't need to run all the validation
+    // functions. The ModelValidationContext runs the validation functions on the model, but
+    // doesn't do anything with patches. The PatchValidationContext runs validation functions on
+    // the patches and on the (patched) model.
     public abstract partial class Validator
     {
         public ValidationResult Validate(DynamicModel model)
@@ -12,10 +18,12 @@ namespace Lisa.Common.WebApi
                 throw new ArgumentNullException("model");
             }
 
+            // Gather information about optional and required fields.
             var fieldInfoContext = new FieldInfoValidationContext();
             _context = fieldInfoContext;
             _context.Validate(this);
 
+            // Run the validation functions for the model.
             _context = new ModelValidationContext(model, fieldInfoContext.FieldTracker);
             _context.Validate(this);
 
@@ -34,18 +42,24 @@ namespace Lisa.Common.WebApi
                 throw new ArgumentNullException("model");
             }
 
+            // Gather information about which fields can be patched.
             var fieldInfoContext = new FieldInfoValidationContext();
             _context = fieldInfoContext;
             _context.Validate(this);
 
+            // Run the validation functions for the patches.
             var patchValidationContext = new PatchValidationContext(model, patches, fieldInfoContext.FieldTracker);
             _context = patchValidationContext;
             _context.Validate(this);
 
+            // Create a patched copy of the model in memory, so we can test the model for
+            // validation errors after patching. We do this on a copy of the model, because we
+            // don't want the validator to also be a patcher.
             var copy = model.Copy();
             var patcher = new ModelPatcher();
             patcher.Apply(patchValidationContext.ValidPatches, copy);
 
+            // Runs the validation functios on the patched model.
             _context = new ModelValidationContext(copy, fieldInfoContext.FieldTracker, Result);
             _context.Validate(this);
 
