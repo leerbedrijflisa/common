@@ -32,30 +32,14 @@ namespace Lisa.Common.WebApi
 
                 if (!_fieldTracker.Exists(property.Key))
                 {
-                    var error = new Error
-                    {
-                        Code = ErrorCode.ExtraField,
-                        Message = $"'{property.Key}' is not a valid field.",
-                        Values = new
-                        {
-                            Field = property.Key
-                        }
-                    };
+                    var error = Error.ExtraField(property.Key);
                     Result.Errors.Add(error);
                 }
             }
 
             foreach (var field in _fieldTracker.MissingFields)
             {
-                var error = new Error
-                {
-                    Code = ErrorCode.FieldMissing,
-                    Message = $"The field '{field}' is required.",
-                    Values = new
-                    {
-                        Field = field
-                    }
-                };
+                var error = Error.FieldMissing(field);
                 Result.Errors.Add(error);
             }
         }

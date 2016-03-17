@@ -23,32 +23,14 @@ namespace Lisa.Common.WebApi
 
                 if (!_validPatchActions.Contains(patch.Action))
                 {
-                    var error = new Error
-                    {
-                        Code = ErrorCode.InvalidAction,
-                        Message = $"'{patch.Action}' is not a valid patch action.",
-                        Values = new
-                        {
-                            Action = patch.Action
-                        }
-                    };
-
+                    var error = Error.InvalidAction(patch.Action);
                     Result.Errors.Add(error);
                     isValid = false;
                 }
 
                 if (!_fieldTracker.Exists(patch.Field))
                 {
-                    var error = new Error
-                    {
-                        Code = ErrorCode.InvalidField,
-                        Message = $"'{patch.Field}' is not a valid field.",
-                        Values = new
-                        {
-                            Field = patch.Field
-                        }
-                    };
-
+                    var error = Error.InvalidField(patch.Field);
                     Result.Errors.Add(error);
                     isValid = false;
                 }
@@ -61,16 +43,7 @@ namespace Lisa.Common.WebApi
 
                     if (!_allowPatch)
                     {
-                        var error = new Error
-                        {
-                            Code = ErrorCode.PatchNotAllowed,
-                            Message = $"The field '{patch.Field}' is not patchable.",
-                            Values = new
-                            {
-                                Field = patch.Field
-                            }
-                        };
-
+                        var error = Error.PatchNotAllowed(patch.Field);
                         Result.Errors.Add(error);
                         isValid = false;
                     }

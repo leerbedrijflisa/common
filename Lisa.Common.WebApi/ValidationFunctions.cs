@@ -7,15 +7,7 @@
             if ((value == null) ||
                 (value is string) && (string.IsNullOrWhiteSpace((string) value)))
             {
-                var error = new Error
-                {
-                    Code = ErrorCode.EmptyValue,
-                    Message = $"The field '{fieldName}' should not be empty.",
-                    Values = new
-                    {
-                        Field = fieldName
-                    }
-                };
+                var error = Error.EmptyValue(fieldName);
                 Result.Errors.Add(error);
             }
         }
