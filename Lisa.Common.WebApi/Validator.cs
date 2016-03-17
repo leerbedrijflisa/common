@@ -7,6 +7,11 @@ namespace Lisa.Common.WebApi
     {
         public ValidationResult Validate(DynamicModel model)
         {
+            if (model == null)
+            {
+                throw new ArgumentNullException("model");
+            }
+
             var fieldInfoContext = new FieldInfoValidationContext();
             _context = fieldInfoContext;
             _context.Validate(this);
@@ -19,6 +24,16 @@ namespace Lisa.Common.WebApi
 
         public ValidationResult Validate(IEnumerable<Patch> patches, DynamicModel model)
         {
+            if (patches == null)
+            {
+                throw new ArgumentNullException("patches");
+            }
+
+            if (model == null)
+            {
+                throw new ArgumentNullException("model");
+            }
+
             var fieldInfoContext = new FieldInfoValidationContext();
             _context = fieldInfoContext;
             _context.Validate(this);
