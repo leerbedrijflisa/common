@@ -11,11 +11,5 @@ namespace Lisa.Common.WebApi
         }
 
         public ICollection<Error> Errors { get; } = new List<Error>();
-
-        internal void Merge(ValidationResult other)
-        {
-            List<Error> errors = (List<Error>) Errors;
-            errors.AddRange(other.Errors);
-        }
     }
 }

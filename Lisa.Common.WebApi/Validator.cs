@@ -7,21 +7,11 @@ namespace Lisa.Common.WebApi
     {
         public ValidationResult Validate(DynamicModel model)
         {
+            GatherFieldInfo();
+
             // Make the model available to all validation functions, so that we don't have to pass
             // it around all the time. This makes derived validators easier to write and read.
             Model = model;
-
-            // Validate the model with a dummy property. If we don't, a model without properties
-            // never gets validated, its fields will never be marked optional or required, and it
-            // becomes impossible to report invalid fields. Also, the FieldTracker relies on the
-            // validation with the dummy property to determine whether a field is marked as both
-            // required and optional.
-            Property = new KeyValuePair<string, object>(string.Empty, null);
-            ValidateModel();
-
-            // Throw away any validation errors that resulted from validating the model with a
-            // dummy property.
-            Result = new ValidationResult();
 
             foreach (var property in model.Properties)
             {
@@ -65,7 +55,6 @@ namespace Lisa.Common.WebApi
 
         public ValidationResult Validate(IEnumerable<Patch> patches, DynamicModel model)
         {
-            var result = new ValidationResult();
             List<Patch> validPatches = new List<Patch>();
 
             GatherFieldInfo();
@@ -86,7 +75,7 @@ namespace Lisa.Common.WebApi
                         }
                     };
 
-                    result.Errors.Add(error);
+                    Result.Errors.Add(error);
                     isValid = false;
                 }
 
@@ -102,7 +91,7 @@ namespace Lisa.Common.WebApi
                         }
                     };
 
-                    result.Errors.Add(error);
+                    Result.Errors.Add(error);
                     isValid = false;
                 }
 
@@ -124,7 +113,7 @@ namespace Lisa.Common.WebApi
                             }
                         };
 
-                        result.Errors.Add(error);
+                        Result.Errors.Add(error);
                         isValid = false;
                     }
                 }
@@ -139,8 +128,7 @@ namespace Lisa.Common.WebApi
             patcher.Apply(validPatches, model);
             Validate(model);
 
-            result.Merge(Result);
-            return result;
+            return Result;
         }
 
         protected abstract void ValidateModel();
@@ -186,6 +174,12 @@ namespace Lisa.Common.WebApi
 
         private void GatherFieldInfo()
         {
+            // Run the validation with a dummy model and a dummy property. If we don't, a model
+            // without properties never gets validated, its fields will never be marked optional
+            // or required, and it becomes impossible to report invalid fields. Also, the
+            // FieldTracker relies on the validation with the dummy property to determine whether
+            // a field is marked as both required and optional.
+
             var resultBackup = Result;
             Result = new ValidationResult();
 
