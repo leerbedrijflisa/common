@@ -144,6 +144,42 @@ namespace Lisa.Common.UnitTests
             Assert.Throws<InvalidOperationException>(() => validator.Validate(contradiction));
         }
 
+        [Fact]
+        public void ItThrowsWhenAccessingModelOutsideRequiredAndOptional()
+        {
+            var model = new DynamicModel();
+            var validator = new NastyModelValidator();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
+        }
+
+        [Fact]
+        public void ItThrowsWhenAccessingResultOutsideRequiredAndOptional()
+        {
+            var model = new DynamicModel();
+            var validator = new NastyResultValidator();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
+        }
+
+        [Fact]
+        public void ItThrowsWhenAccessingPropertyOutsideRequiredAndOptional()
+        {
+            var model = new DynamicModel();
+            var validator = new NastyPropertyValidator();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
+        }
+
+        [Fact]
+        public void ItThrowsWhenAccessingPatchOutsideRequiredAndOptional()
+        {
+            var model = new DynamicModel();
+            var validator = new NastyPatchValidator();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -197,6 +233,38 @@ namespace Lisa.Common.UnitTests
         {
             Required("fact");
             Optional("fact");
+        }
+    }
+
+    public class NastyModelValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            var model = Model;
+        }
+    }
+
+    public class NastyPropertyValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            var property = Property;
+        }
+    }
+
+    public class NastyPatchValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            var patch = Patch;
+        }
+    }
+
+    public class NastyResultValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            var result = Result;
         }
     }
 }

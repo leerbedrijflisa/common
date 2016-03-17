@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Lisa.Common.WebApi
 {
@@ -6,10 +7,29 @@ namespace Lisa.Common.WebApi
     {
         public FieldInfoValidationContext()
         {
-            Result = new ValidationResult();
         }
 
         public FieldTracker FieldTracker { get; } = new FieldTracker();
+
+        public override DynamicModel Model
+        {
+            get { throw new InvalidOperationException("You cannot access Model outside of validation functions."); }
+        }
+
+        public override KeyValuePair<string, object> Property
+        {
+            get { throw new InvalidOperationException("You cannot access Property outside of validation functions."); }
+        }
+
+        public override ValidationResult Result
+        {
+            get { throw new InvalidOperationException("You cannot access Result outside of validation functions."); }
+        }
+
+        public override Patch Patch
+        {
+            get { throw new InvalidOperationException("You cannot access Patch outside of validation functions."); }
+        }
 
         public override void Validate(Validator validator)
         {

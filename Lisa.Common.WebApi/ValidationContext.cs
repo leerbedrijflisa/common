@@ -5,7 +5,7 @@ namespace Lisa.Common.WebApi
 {
     internal abstract class ValidationContext
     {
-        public ValidationResult Result { get; protected set; }
+        public virtual ValidationResult Result { get; protected set; }
         public virtual DynamicModel Model { get; protected set; }
         public virtual KeyValuePair<string, object> Property { get; protected internal set; }
         public virtual Patch Patch { get; protected internal set; }
