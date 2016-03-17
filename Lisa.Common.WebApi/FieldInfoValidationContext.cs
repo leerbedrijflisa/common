@@ -14,6 +14,7 @@ namespace Lisa.Common.WebApi
         public override void Validate(Validator validator)
         {
             validator.ValidateModel();
+            validator.ValidatePatch();
         }
 
         public override void Required(string fieldName, params Action<string, object>[] validationFunctions)
@@ -28,7 +29,7 @@ namespace Lisa.Common.WebApi
 
         public override void Allow(string fieldName)
         {
-            //FieldTracker.MarkAllowed(fieldName);
+            FieldTracker.MarkAllowed(fieldName);
         }
     }
 }

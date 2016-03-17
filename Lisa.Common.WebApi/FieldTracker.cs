@@ -11,7 +11,7 @@ namespace Lisa.Common.WebApi
             get
             {
                 return from field in _fields
-                       where field.Value == FieldStatus.Required
+                       where ((field.Value & FieldStatus.Required) == FieldStatus.Required) && ((field.Value & FieldStatus.Present) == 0)
                        select field.Key;
             }
         }
@@ -21,41 +21,65 @@ namespace Lisa.Common.WebApi
             return _fields.Any(f => string.Equals(f.Key, fieldName, StringComparison.OrdinalIgnoreCase));
         }
 
-        public void MarkRequired(string fieldName)
+        public bool IsOptional(string fieldName)
         {
             var field = FindField(fieldName);
-            if (field.Key == null)
-            {
-                _fields[fieldName] = FieldStatus.Required;
-            }
-            // This check works because the validator runs all validations with a dummy property
-            // first. In that first pass, fields never get marked as present and this check relies
-            // on that fact.
-            else if (field.Value == FieldStatus.Optional)
+            return field.Key != null && ((field.Value & FieldStatus.Optional) == FieldStatus.Optional);
+        }
+
+        public bool IsRequired(string fieldName)
+        {
+            var field = FindField(fieldName);
+            return field.Key != null && ((field.Value & FieldStatus.Required) == FieldStatus.Required);
+        }
+
+        public bool IsAllowed(string fieldName)
+        {
+            var field = FindField(fieldName);
+            return field.Key != null && ((field.Value & FieldStatus.Allowed) == FieldStatus.Allowed);
+        }
+
+        public void MarkRequired(string fieldName)
+        {
+            if (IsOptional(fieldName))
             {
                 throw new InvalidOperationException($"Cannot mark field '{fieldName}' as required, because it is already marked as optional.");
             }
+
+            AddStatus(fieldName, FieldStatus.Required);
         }
 
         public void MarkOptional(string fieldName)
         {
-            var field = FindField(fieldName);
-            if (field.Key == null)
-            {
-                _fields[fieldName] = FieldStatus.Optional;
-            }
-            // This check works because the validator runs all validations with a dummy property
-            // first. In that first pass, fields never get marked as present and this check relies
-            // on that fact.
-            else if (field.Value == FieldStatus.Required)
+            if (IsRequired(fieldName))
             {
                 throw new InvalidOperationException($"Cannot mark field '{fieldName}' as optional, because it is already marked as required.");
             }
+
+            AddStatus(fieldName, FieldStatus.Optional);
         }
 
         public void MarkPresent(string fieldName)
         {
-            _fields[fieldName] = FieldStatus.Present;
+            AddStatus(fieldName, FieldStatus.Present);
+        }
+
+        public void MarkAllowed(string fieldName)
+        {
+            AddStatus(fieldName, FieldStatus.Allowed);
+        }
+
+        private void AddStatus(string fieldName, FieldStatus status)
+        {
+            var field = FindField(fieldName);
+            if (field.Key == null)
+            {
+                _fields[fieldName] = status;
+            }
+            else
+            {
+                _fields[fieldName] |= status;
+            }
         }
 
         private KeyValuePair<string, FieldStatus> FindField(string fieldName)

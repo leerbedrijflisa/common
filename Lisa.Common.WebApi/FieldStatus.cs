@@ -1,10 +1,13 @@
-﻿namespace Lisa.Common.WebApi
+﻿using System;
+
+namespace Lisa.Common.WebApi
 {
+    [Flags]
     internal enum FieldStatus
     {
-        Required,       // The field is known to be required, but hasn't been found yet.
-        Optional,       // The field is known to be optional, but hasn't been found yet.
-        Present         // The field was found, so we don't care anymore whether it's required or
-                        // optional.
+        Required = 1,
+        Optional = 2,
+        Present = 4,
+        Allowed = 8
     }
 }

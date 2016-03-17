@@ -35,18 +35,11 @@ namespace Lisa.Common.WebApi
                     isValid = false;
                 }
 
-                if (isValid)
+                if (isValid && !_fieldTracker.IsAllowed(patch.Field))
                 {
-                    Patch = patch;
-                    _allowPatch = false;
-                    validator.ValidatePatch();
-
-                    if (!_allowPatch)
-                    {
-                        var error = Error.PatchNotAllowed(patch.Field);
-                        Result.Errors.Add(error);
-                        isValid = false;
-                    }
+                    var error = Error.PatchNotAllowed(patch.Field);
+                    Result.Errors.Add(error);
+                    isValid = false;
                 }
 
                 if (isValid)
@@ -61,10 +54,9 @@ namespace Lisa.Common.WebApi
 
         public override void Allow(string fieldName)
         {
-            if (string.Equals(Patch.Field, fieldName, StringComparison.OrdinalIgnoreCase))
-            {
-                _allowPatch = true;
-            }
+            // This method is empty, because the only check on patches we do right now (checking
+            // if you are allowed to patch the given field) is already done by the
+            // FieldInfoValidationContext. In the future, we'll probably add more checks here.
         }
 
         public override void Required(string fieldName, params Action<string, object>[] validationFunctions)
@@ -90,7 +82,6 @@ namespace Lisa.Common.WebApi
             }
         }
 
-        private bool _allowPatch;
         private IEnumerable<Patch> _patches;
         private FieldTracker _fieldTracker;
         private readonly List<string> _validPatchActions = new List<string> { "replace" };
