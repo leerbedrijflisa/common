@@ -45,6 +45,20 @@
             };
         }
 
+        internal static Error IncorrectValue(string field, string[] allowed)
+        {
+            string values = string.Join(", ", allowed);
+            return new Error
+            {
+                Code = ErrorCode.IncorrectValue,
+                Message = $"The field '{field}' should have one of the following values: {values}.",
+                Values = new
+                {
+                    Allowed = allowed
+                }
+            };
+        }
+
         internal static Error InvalidAction(string action)
         {
             return new Error

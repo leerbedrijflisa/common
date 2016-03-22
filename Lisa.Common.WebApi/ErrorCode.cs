@@ -13,9 +13,10 @@
     public static class ErrorCode
     {
         // Model validation errors
-        public static int FieldMissing  { get; } = 0x0001 << 15;
-        public static int ExtraField    { get; } = 0x0002 << 15;
-        public static int EmptyValue    { get; } = 0x0003 << 15;
+        public static int FieldMissing   { get; } = 0x0001 << 15;
+        public static int ExtraField     { get; } = 0x0002 << 15;
+        public static int EmptyValue     { get; } = 0x0003 << 15;
+        public static int IncorrectValue { get; } = 0x0004 << 15;
 
         // Patch validation errors
         public static int InvalidAction   { get; } = 0x0100 << 15;
