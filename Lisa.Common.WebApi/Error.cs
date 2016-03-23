@@ -83,5 +83,20 @@
                 }
             };
         }
+
+        internal static Error InvalidLength(string field, int expected, int actual)
+        {
+            return new Error
+            {
+                Code = ErrorCode.InvalidLength,
+                Message = $"The length of field '{field}' should be {expected}, but is {actual}.",
+                Values = new
+                {
+                    Field = field,
+                    Expected = expected,
+                    Actual = actual
+                }
+            };
+        }
     }
 }
