@@ -56,12 +56,7 @@ namespace Lisa.Common.WebApi
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             var property = Properties.SingleOrDefault(p => string.Equals(p.Key, binder.Name, StringComparison.OrdinalIgnoreCase));
-            if (property.Key == null)
-            {
-                return base.TryGetMember(binder, out result);
-            }
-
-            result = property.Value;
+            result = property.Key == null ? null : property.Value;
             return true;
         }
 
