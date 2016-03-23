@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Xunit;
+using System;
 
 namespace Lisa.Common.UnitTests.WebApi
 {
@@ -196,6 +197,40 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.False(result.HasErrors);
         }
 
+        [Fact]
+        public void ItSucceedsWhenOneOfTheSpecifiedLengthsIsEqual()
+        {
+            dynamic code = new DynamicModel();
+            code.Letters = "multiple";
+
+            var validator = new MultiwordValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItReportsWhenNoneOfTheSpecifiedLengthsIsEqual()
+        {
+            dynamic code = new DynamicModel();
+            code.Letters = "no";
+
+            var validator = new MultiwordValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            var expected = (int[]) AnonymousField(error.Values, "Expected");
+            Assert.Equal(ErrorCode.InvalidLength, error.Code);
+            Assert.Equal("Letters", AnonymousField(error.Values, "Field"));
+            Assert.Equal(2, AnonymousField(error.Values, "Actual"));
+            Assert.Contains(5, expected);
+            Assert.Contains(8, expected);
+            Assert.Contains(13, expected);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -211,6 +246,14 @@ namespace Lisa.Common.UnitTests.WebApi
             Optional("letters", Length(4));
             Optional("characters", MinLength(3));
             Optional("glyphs", MaxLength(2));
+        }
+    }
+
+    public class MultiwordValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("letters", Length(5, 8, 13));
         }
     }
 }
