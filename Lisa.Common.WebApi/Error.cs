@@ -1,4 +1,6 @@
-﻿namespace Lisa.Common.WebApi
+﻿using System.Linq;
+
+namespace Lisa.Common.WebApi
 {
     public class Error
     {
@@ -45,7 +47,7 @@
             };
         }
 
-        internal static Error IncorrectValue(string field, string[] allowed)
+        internal static Error IncorrectValue<T>(string field, T[] allowed)
         {
             string values = string.Join(", ", allowed);
             return new Error

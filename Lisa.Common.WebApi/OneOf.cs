@@ -16,5 +16,17 @@ namespace Lisa.Common.WebApi
                 }
             };
         }
+
+        protected virtual Action<string, object> OneOf(params double[] values)
+        {
+            return (fieldName, value) =>
+            {
+                if (value != null && !values.Contains((double) value))
+                {
+                    var error = Error.IncorrectValue(fieldName, values);
+                    Result.Errors.Add(error);
+                }
+            };
+        }
     }
 }
