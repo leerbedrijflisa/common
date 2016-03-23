@@ -99,6 +99,23 @@
             };
         }
 
+        internal static Error InvalidLength(string field, int[] expected, int actual)
+        {
+            var lengths = string.Join(", ", expected);
+
+            return new Error
+            {
+                Code = ErrorCode.InvalidLength,
+                Message = $"The length of field '{field}' is {actual}, but should be one of the following: {lengths}.",
+                Values = new
+                {
+                    Field = field,
+                    Expected = expected,
+                    Actual = actual
+                }
+            };
+        }
+
         internal static Error TooShort(string field, int minimum, int actual)
         {
             return new Error

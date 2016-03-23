@@ -196,6 +196,40 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.False(result.HasErrors);
         }
 
+        [Fact]
+        public void ItSucceedsWhenOneOfTheSpecifiedLengthsIsEqual()
+        {
+            dynamic code = new DynamicModel();
+            code.Digits = new int[] { 3, 4, 5, 2, 6, 9, 1, 0 };
+
+            var validator = new MulticodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItReportsWhenNoneOfTheSpecifiedLengthsIsEqual()
+        {
+            dynamic code = new DynamicModel();
+            code.Digits = new int[] { 7, 4 };
+
+            var validator = new MulticodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            var expected = (int[]) AnonymousField(error.Values, "Expected");
+            Assert.Equal(ErrorCode.InvalidLength, error.Code);
+            Assert.Equal("Digits", AnonymousField(error.Values, "Field"));
+            Assert.Equal(2, AnonymousField(error.Values, "Actual"));
+            Assert.Contains(5, expected);
+            Assert.Contains(8, expected);
+            Assert.Contains(13, expected);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -211,6 +245,14 @@ namespace Lisa.Common.UnitTests.WebApi
             Optional("digits", Length(4));
             Optional("numbers", MinLength(3));
             Optional("elements", MaxLength(2));
+        }
+    }
+
+    public class MulticodeValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("digits", Length(5, 8, 13));
         }
     }
 }
