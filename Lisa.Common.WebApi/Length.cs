@@ -9,6 +9,11 @@ namespace Lisa.Common.WebApi
         {
             return (fieldName, value) =>
             {
+                if (value == null || !(value is ICollection))
+                {
+                    return;
+                }
+
                 var collection = (ICollection) value;
                 if (collection.Count != length)
                 {

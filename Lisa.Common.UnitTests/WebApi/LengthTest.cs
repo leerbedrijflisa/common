@@ -38,6 +38,30 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(3, AnonymousField(error.Values, "Actual"));
         }
 
+        [Fact]
+        public void ItIgnoresANullValue()
+        {
+            dynamic code = new DynamicModel();
+            code.Digits = null;
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItIgnoresAValueOfInvalidType()
+        {
+            dynamic code = new DynamicModel();
+            code.Digits = 15;
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
