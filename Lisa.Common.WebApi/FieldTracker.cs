@@ -33,6 +33,12 @@ namespace Lisa.Common.WebApi
             return field.Key != null && ((field.Value & FieldStatus.Required) == FieldStatus.Required);
         }
 
+        public bool IsIgnored(string fieldName)
+        {
+            var field = FindField(fieldName);
+            return field.Key != null && ((field.Value & FieldStatus.Ignore) == FieldStatus.Ignore);
+        }
+
         public bool IsAllowed(string fieldName)
         {
             var field = FindField(fieldName);
@@ -46,6 +52,11 @@ namespace Lisa.Common.WebApi
                 throw new InvalidOperationException($"Cannot mark field '{fieldName}' as required, because it is already marked as optional.");
             }
 
+            if (IsIgnored(fieldName))
+            {
+                throw new InvalidOperationException($"Cannot mark field '{fieldName}' as required, because it is already ignored.");
+            }
+
             AddStatus(fieldName, FieldStatus.Required);
         }
 
@@ -56,7 +67,27 @@ namespace Lisa.Common.WebApi
                 throw new InvalidOperationException($"Cannot mark field '{fieldName}' as optional, because it is already marked as required.");
             }
 
+            if (IsIgnored(fieldName))
+            {
+                throw new InvalidOperationException($"Cannot mark field '{fieldName}' as optional, because it is already ignored.");
+            }
+
             AddStatus(fieldName, FieldStatus.Optional);
+        }
+
+        public void MarkIgnored(string fieldName)
+        {
+            if (IsOptional(fieldName))
+            {
+                throw new InvalidOperationException($"Cannot ignore field '{fieldName}', because it is already marked as optional.");
+            }
+
+            if (IsRequired(fieldName))
+            {
+                throw new InvalidOperationException($"Cannot ignore field '{fieldName}', because it is already marked as required.");
+            }
+
+            AddStatus(fieldName, FieldStatus.Ignore);
         }
 
         public void MarkPresent(string fieldName)

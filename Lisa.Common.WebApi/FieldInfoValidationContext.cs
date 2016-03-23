@@ -47,6 +47,11 @@ namespace Lisa.Common.WebApi
             FieldTracker.MarkOptional(fieldName);
         }
 
+        public override void Ignore(string fieldName)
+        {
+            FieldTracker.MarkIgnored(fieldName);
+        }
+
         public override void Allow(string fieldName)
         {
             FieldTracker.MarkAllowed(fieldName);

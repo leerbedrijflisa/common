@@ -99,6 +99,11 @@ namespace Lisa.Common.WebApi
             _context.Optional(fieldName, validationFunctions);
         }
 
+        protected void Ignore(string fieldName)
+        {
+            _context.Ignore(fieldName);
+        }
+
         protected void Allow(string fieldName)
         {
             _context.Allow(fieldName);

@@ -8,6 +8,7 @@ namespace Lisa.Common.WebApi
         Required = 1,
         Optional = 2,
         Present = 4,
-        Allowed = 8
+        Allowed = 8,
+        Ignore = 16
     }
 }
