@@ -129,6 +129,73 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.False(result.HasErrors);
         }
 
+        [Fact]
+        public void ItSucceedsWhenArrayLengthIsMaximum()
+        {
+            dynamic code = new DynamicModel();
+            code.Elements = new int[] { 3, 5 };
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItSucceedsWhenArrayLengthIsBelowMaximum()
+        {
+            dynamic code = new DynamicModel();
+            code.Elements = new int[] { 3 };
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItReportsWhenArrayLengthIsAboveMaximum()
+        {
+            dynamic code = new DynamicModel();
+            code.Elements = new int[] { 2, 9, 7, 6 };
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.TooLong, error.Code);
+            Assert.Equal("Elements", AnonymousField(error.Values, "Field"));
+            Assert.Equal(2, AnonymousField(error.Values, "Maximum"));
+            Assert.Equal(4, AnonymousField(error.Values, "Actual"));
+        }
+
+        [Fact]
+        public void ItIgnoresANullValueOnMaxLength()
+        {
+            dynamic code = new DynamicModel();
+            code.Elements = null;
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItIgnoresAValueOfInvalidTypeOnMaxLength()
+        {
+            dynamic code = new DynamicModel();
+            code.Elements = 15;
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -143,6 +210,7 @@ namespace Lisa.Common.UnitTests.WebApi
         {
             Optional("digits", Length(4));
             Optional("numbers", MinLength(3));
+            Optional("elements", MaxLength(2));
         }
     }
 }

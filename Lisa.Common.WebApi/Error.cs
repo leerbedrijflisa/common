@@ -113,5 +113,20 @@
                 }
             };
         }
+
+        internal static Error TooLong(string field, int maximum, int actual)
+        {
+            return new Error
+            {
+                Code = ErrorCode.TooLong,
+                Message = $"The length of field '{field}' should be at most {maximum}, but is {actual}.",
+                Values = new
+                {
+                    Field = field,
+                    Maximum = maximum,
+                    Actual = actual
+                }
+            };
+        }
     }
 }
