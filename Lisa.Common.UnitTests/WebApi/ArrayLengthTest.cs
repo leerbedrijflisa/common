@@ -5,10 +5,10 @@ using Xunit;
 
 namespace Lisa.Common.UnitTests.WebApi
 {
-    public class LengthTest
+    public class ArrayLengthTest
     {
         [Fact]
-        public void ItSucceedsWhenArrayLengthIsEqual()
+        public void ItSucceedsWhenLengthIsEqual()
         {
             dynamic code = new DynamicModel();
             code.Digits = new int[] { 3, 4, 5, 2 };
@@ -20,7 +20,7 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItReportsWhenArrayLengthIsNotEqual()
+        public void ItReportsWhenLengthIsNotEqual()
         {
             dynamic code = new DynamicModel();
             code.Digits = new int[] { 9, 3, 0 };
@@ -63,7 +63,7 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItSucceedsWhenArrayLengthIsMinimum()
+        public void ItSucceedsWhenLengthIsMinimum()
         {
             dynamic code = new DynamicModel();
             code.Numbers = new int[] { 3, 5, 2 };
@@ -75,7 +75,7 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItSucceedsWhenArrayLengthIsAboveMinimum()
+        public void ItSucceedsWhenLengthIsAboveMinimum()
         {
             dynamic code = new DynamicModel();
             code.Numbers = new int[] { 3, 5, 2, 9 };
@@ -87,7 +87,7 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItReportsWhenArrayLengthIsBelowMinimum()
+        public void ItReportsWhenLengthIsBelowMinimum()
         {
             dynamic code = new DynamicModel();
             code.Numbers = new int[] { 2, 9 };
@@ -130,7 +130,7 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItSucceedsWhenArrayLengthIsMaximum()
+        public void ItSucceedsWhenLengthIsMaximum()
         {
             dynamic code = new DynamicModel();
             code.Elements = new int[] { 3, 5 };
@@ -142,7 +142,7 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItSucceedsWhenArrayLengthIsBelowMaximum()
+        public void ItSucceedsWhenLengthIsBelowMaximum()
         {
             dynamic code = new DynamicModel();
             code.Elements = new int[] { 3 };
@@ -154,7 +154,7 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItReportsWhenArrayLengthIsAboveMaximum()
+        public void ItReportsWhenLengthIsAboveMaximum()
         {
             dynamic code = new DynamicModel();
             code.Elements = new int[] { 2, 9, 7, 6 };

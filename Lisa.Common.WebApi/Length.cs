@@ -9,15 +9,15 @@ namespace Lisa.Common.WebApi
         {
             return (fieldName, value) =>
             {
-                if (value == null || !(value is ICollection))
+                if (value == null || !((value is ICollection) || (value is string)))
                 {
                     return;
                 }
 
-                var collection = (ICollection) value;
-                if (collection.Count != length)
+                int actual = value is ICollection ? ((ICollection) value).Count : ((string) value).Length;
+                if (actual != length)
                 {
-                    var error = Error.InvalidLength(fieldName, length, collection.Count);
+                    var error = Error.InvalidLength(fieldName, length, actual);
                     Result.Errors.Add(error);
                 }
             };
@@ -27,15 +27,15 @@ namespace Lisa.Common.WebApi
         {
             return (fieldName, value) =>
             {
-                if (value == null || !(value is ICollection))
+                if (value == null || !((value is ICollection) || (value is string)))
                 {
                     return;
                 }
 
-                var collection = (ICollection) value;
-                if (collection.Count < minimum)
+                int actual = value is ICollection ? ((ICollection) value).Count : ((string) value).Length;
+                if (actual < minimum)
                 {
-                    var error = Error.TooShort(fieldName, minimum, collection.Count);
+                    var error = Error.TooShort(fieldName, minimum, actual);
                     Result.Errors.Add(error);
                 }
             };
@@ -45,15 +45,15 @@ namespace Lisa.Common.WebApi
         {
             return (fieldName, value) =>
             {
-                if (value == null || !(value is ICollection))
+                if (value == null || !((value is ICollection) || (value is string)))
                 {
                     return;
                 }
 
-                var collection = (ICollection) value;
-                if (collection.Count > maximum)
+                int actual = value is ICollection ? ((ICollection) value).Count : ((string) value).Length;
+                if (actual > maximum)
                 {
-                    var error = Error.TooLong(fieldName, maximum, collection.Count);
+                    var error = Error.TooLong(fieldName, maximum, actual);
                     Result.Errors.Add(error);
                 }
             };
