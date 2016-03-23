@@ -98,5 +98,20 @@
                 }
             };
         }
+
+        internal static Error TooShort(string field, int minimum, int actual)
+        {
+            return new Error
+            {
+                Code = ErrorCode.TooShort,
+                Message = $"The length of field '{field}' should be at least {minimum}, but is {actual}.",
+                Values = new
+                {
+                    Field = field,
+                    Minimum = minimum,
+                    Actual = actual
+                }
+            };
+        }
     }
 }

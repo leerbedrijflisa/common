@@ -22,5 +22,23 @@ namespace Lisa.Common.WebApi
                 }
             };
         }
+
+        protected virtual Action<string, object> MinLength(int minimum)
+        {
+            return (fieldName, value) =>
+            {
+                if (value == null || !(value is ICollection))
+                {
+                    return;
+                }
+
+                var collection = (ICollection) value;
+                if (collection.Count < minimum)
+                {
+                    var error = Error.TooShort(fieldName, minimum, collection.Count);
+                    Result.Errors.Add(error);
+                }
+            };
+        }
     }
 }

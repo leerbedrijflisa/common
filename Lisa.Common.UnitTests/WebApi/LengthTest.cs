@@ -39,7 +39,7 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItIgnoresANullValue()
+        public void ItIgnoresANullValueOnLength()
         {
             dynamic code = new DynamicModel();
             code.Digits = null;
@@ -51,10 +51,77 @@ namespace Lisa.Common.UnitTests.WebApi
         }
 
         [Fact]
-        public void ItIgnoresAValueOfInvalidType()
+        public void ItIgnoresAValueOfInvalidTypeOnLength()
         {
             dynamic code = new DynamicModel();
             code.Digits = 15;
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItSucceedsWhenArrayLengthIsMinimum()
+        {
+            dynamic code = new DynamicModel();
+            code.Numbers = new int[] { 3, 5, 2 };
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItSucceedsWhenArrayLengthIsAboveMinimum()
+        {
+            dynamic code = new DynamicModel();
+            code.Numbers = new int[] { 3, 5, 2, 9 };
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItReportsWhenArrayLengthIsBelowMinimum()
+        {
+            dynamic code = new DynamicModel();
+            code.Numbers = new int[] { 2, 9 };
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.TooShort, error.Code);
+            Assert.Equal("Numbers", AnonymousField(error.Values, "Field"));
+            Assert.Equal(3, AnonymousField(error.Values, "Minimum"));
+            Assert.Equal(2, AnonymousField(error.Values, "Actual"));
+        }
+
+        [Fact]
+        public void ItIgnoresANullValueOnMinLength()
+        {
+            dynamic code = new DynamicModel();
+            code.Numbers = null;
+
+            var validator = new CodeValidator();
+            ValidationResult result = validator.Validate(code);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItIgnoresAValueOfInvalidTypeOnMinLength()
+        {
+            dynamic code = new DynamicModel();
+            code.Numbers = 15;
 
             var validator = new CodeValidator();
             ValidationResult result = validator.Validate(code);
@@ -74,7 +141,8 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("digits", Length(4));
+            Optional("digits", Length(4));
+            Optional("numbers", MinLength(3));
         }
     }
 }

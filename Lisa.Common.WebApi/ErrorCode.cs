@@ -17,6 +17,7 @@
         public static int ExtraField    { get; } = 0x0002 << 15;
         public static int EmptyValue    { get; } = 0x0003 << 15;
         public static int InvalidLength { get; } = 0x0004 << 15;
+        public static int TooShort      { get; } = 0x0005 << 15;
 
         // Patch validation errors
         public static int InvalidAction   { get; } = 0x0100 << 15;
