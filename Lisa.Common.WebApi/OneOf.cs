@@ -9,7 +9,7 @@ namespace Lisa.Common.WebApi
         {
             return (fieldName, value) =>
             {
-                if (!values.Contains(value))
+                if (value != null && !values.Contains(value))
                 {
                     var error = Error.IncorrectValue(fieldName, values);
                     Result.Errors.Add(error);
