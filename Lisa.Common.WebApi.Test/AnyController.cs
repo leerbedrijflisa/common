@@ -20,7 +20,19 @@ namespace Lisa.Common.WebApi.Test
         {
             var result = new AnyValidator().Validate(model);
 
-            return new UnprocessableEntityObjectResult(result.Errors);
+            return new UnprocessableEntityObjectResult(result);
+        }
+
+        [HttpPatch("{id}")]
+        public ActionResult Patch([FromBody] Patch[] patches, int id)
+        {
+            dynamic model = new DynamicModel();
+            model.SomeThing = 1;
+
+            var validator = new AnyValidator();
+            var result = validator.Validate(patches, model);
+
+            return new HttpOkObjectResult(result);
         }
     }
 
@@ -29,6 +41,11 @@ namespace Lisa.Common.WebApi.Test
         protected override void ValidateModel()
         {
             Required("something");
+        }
+
+        protected override void ValidatePatch()
+        {
+            Allow("somETHIng");
         }
     }
 }

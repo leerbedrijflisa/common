@@ -189,6 +189,24 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal("Anthony Burgess", model.Author);
         }
 
+        [Fact]
+        public void ItIgnoresCaseOfAllowedFieldNames()
+        {
+            var validator = new BookValidator();
+            dynamic book = new DynamicModel();
+            book.tItLe = "The Count of Monte-Cristo";
+
+            var patch = new Patch
+            {
+                Action = "replace",
+                Field = "TiTlE",
+                Value = "A Clockwork Orange"
+            };
+
+            ValidationResult result = validator.Validate(book);
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();

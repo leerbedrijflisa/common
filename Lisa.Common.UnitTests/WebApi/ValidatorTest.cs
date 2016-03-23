@@ -39,7 +39,7 @@ namespace Lisa.Common.UnitTests
         {
             var validator = new BookValidator();
             dynamic book = new DynamicModel();
-            book.Title = "The Count of Monte-Cristo";
+            book.tItLe = "The Count of Monte-Cristo";
 
             ValidationResult result = validator.Validate(book);
             Assert.False(result.HasErrors);
