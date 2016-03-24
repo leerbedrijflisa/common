@@ -47,16 +47,18 @@ namespace Lisa.Common.WebApi
             };
         }
 
-        internal static Error IncorrectValue<T>(string field, T[] allowed)
+        internal static Error IncorrectValue<T>(string field, T[] allowed, object actual)
         {
             string values = string.Join(", ", allowed);
             return new Error
             {
                 Code = ErrorCode.IncorrectValue,
-                Message = $"The field '{field}' should have one of the following values: {values}.",
+                Message = $"The field '{field}' has value '{actual}', but should have one of the following values: {values}.",
                 Values = new
                 {
-                    Allowed = allowed
+                    Field = field,
+                    Allowed = allowed,
+                    Actual = actual
                 }
             };
         }

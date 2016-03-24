@@ -98,6 +98,8 @@ namespace Lisa.Common.UnitTests.WebApi
             var error = result.Errors.First();
             var values = (double[]) AnonymousField(error.Values, "Allowed");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
+            Assert.Equal("Quarters", AnonymousField(error.Values, "Field"));
+            Assert.Equal(0.15, AnonymousField(error.Values, "Actual"));
             Assert.Contains(0.25, values);
             Assert.Contains(0.5, values);
             Assert.Contains(0.75, values);
@@ -167,6 +169,8 @@ namespace Lisa.Common.UnitTests.WebApi
             var error = result.Errors.First();
             var values = (double[]) AnonymousField(error.Values, "Allowed");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
+            Assert.Equal("Quarters", AnonymousField(error.Values, "Field"));
+            Assert.Equal("three", AnonymousField(error.Values, "Actual"));
             Assert.Contains(0.25, values);
             Assert.Contains(0.5, values);
             Assert.Contains(0.75, values);

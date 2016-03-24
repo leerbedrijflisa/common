@@ -11,7 +11,7 @@ namespace Lisa.Common.WebApi
             {
                 if (value != null && !values.Contains(value))
                 {
-                    var error = Error.IncorrectValue(fieldName, values);
+                    var error = Error.IncorrectValue(fieldName, values, value);
                     Result.Errors.Add(error);
                 }
             };
@@ -45,7 +45,7 @@ namespace Lisa.Common.WebApi
                 }
                 else
                 {
-                    var error = Error.IncorrectValue(fieldName, values);
+                    var error = Error.IncorrectValue(fieldName, values, value);
                     Result.Errors.Add(error);
                     return;
                 }
@@ -53,7 +53,7 @@ namespace Lisa.Common.WebApi
                 double variance = Math.Pow(10, -8);
                 if (!values.Any(v => Math.Abs(convertedValue - v) < variance))
                 {
-                    var error = Error.IncorrectValue(fieldName, values);
+                    var error = Error.IncorrectValue(fieldName, values, convertedValue);
                     Result.Errors.Add(error);
                 }
             };
