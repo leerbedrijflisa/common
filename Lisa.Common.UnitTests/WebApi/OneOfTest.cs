@@ -101,6 +101,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Contains(0.25, values);
             Assert.Contains(0.5, values);
             Assert.Contains(0.75, values);
+            Assert.Contains(1, values);
         }
 
         [Fact]
@@ -113,6 +114,63 @@ namespace Lisa.Common.UnitTests.WebApi
             ValidationResult result = validator.Validate(model);
 
             Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItAcceptsAMatchingFloatValue()
+        {
+            dynamic model = new DynamicModel();
+            model.Quarters = 0.25f;
+
+            var validator = new OneOfDoubleValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItAcceptsAMatchingIntValue()
+        {
+            dynamic model = new DynamicModel();
+            model.Quarters = 1;
+
+            var validator = new OneOfDoubleValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItAcceptsAMatchingDecimalValue()
+        {
+            dynamic model = new DynamicModel();
+            model.Quarters = 0.50m;
+
+            var validator = new OneOfDoubleValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItReportsMatchingANonNumberAgainstAnArrayOfDoubles()
+        {
+            dynamic model = new DynamicModel();
+            model.Quarters = "three";
+
+            var validator = new OneOfDoubleValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            var values = (double[]) AnonymousField(error.Values, "Allowed");
+            Assert.Equal(ErrorCode.IncorrectValue, error.Code);
+            Assert.Contains(0.25, values);
+            Assert.Contains(0.5, values);
+            Assert.Contains(0.75, values);
+            Assert.Contains(1, values);
         }
 
         private object AnonymousField(object obj, string fieldName)
@@ -135,7 +193,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("quarters", OneOf(0.25, 0.5, 0.75));
+            Required("quarters", OneOf(0.25, 0.5, 0.75, 1.0));
         }
     }
 }
