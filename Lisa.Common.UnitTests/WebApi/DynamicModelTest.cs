@@ -17,13 +17,6 @@ namespace Lisa.Common.UnitTests
         }
 
         [Fact]
-        public void ItThrowsWhenGettingAPropertyThatDoesntExist()
-        {
-            dynamic model = new DynamicModel();
-            Assert.Throws<RuntimeBinderException>(() => model.Foo);
-        }
-
-        [Fact]
         public void ItIgnoresTheCaseOfPropertyNames()
         {
             dynamic model = new DynamicModel();
@@ -136,6 +129,13 @@ namespace Lisa.Common.UnitTests
             model["Foo"] = "bar";
 
             Assert.Equal("bar", model.Foo);
+        }
+
+        [Fact]
+        public void ItReturnsNullWhenGettingAPropertyThatDoesntExist()
+        {
+            dynamic model = new DynamicModel();
+            Assert.Null(model.Absent);
         }
     }
 }

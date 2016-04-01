@@ -101,5 +101,67 @@ namespace Lisa.Common.WebApi
                 }
             };
         }
+
+        internal static Error InvalidLength(string field, int expected, int actual)
+        {
+            return new Error
+            {
+                Code = ErrorCode.InvalidLength,
+                Message = $"The length of field '{field}' should be {expected}, but is {actual}.",
+                Values = new
+                {
+                    Field = field,
+                    Expected = expected,
+                    Actual = actual
+                }
+            };
+        }
+
+        internal static Error InvalidLength(string field, int[] expected, int actual)
+        {
+            var lengths = string.Join(", ", expected);
+
+            return new Error
+            {
+                Code = ErrorCode.InvalidLength,
+                Message = $"The length of field '{field}' is {actual}, but should be one of the following: {lengths}.",
+                Values = new
+                {
+                    Field = field,
+                    Expected = expected,
+                    Actual = actual
+                }
+            };
+        }
+
+        internal static Error TooShort(string field, int minimum, int actual)
+        {
+            return new Error
+            {
+                Code = ErrorCode.TooShort,
+                Message = $"The length of field '{field}' should be at least {minimum}, but is {actual}.",
+                Values = new
+                {
+                    Field = field,
+                    Minimum = minimum,
+                    Actual = actual
+                }
+            };
+        }
+
+        internal static Error TooLong(string field, int maximum, int actual)
+        {
+            return new Error
+            {
+                Code = ErrorCode.TooLong,
+                Message = $"The length of field '{field}' should be at most {maximum}, but is {actual}.",
+                Values = new
+                {
+                    Field = field,
+                    Maximum = maximum,
+                    Actual = actual
+                }
+            };
+        }
     }
 }

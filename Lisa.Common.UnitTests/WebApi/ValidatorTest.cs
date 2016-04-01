@@ -39,7 +39,7 @@ namespace Lisa.Common.UnitTests
         {
             var validator = new BookValidator();
             dynamic book = new DynamicModel();
-            book.Title = "The Count of Monte-Cristo";
+            book.tItLe = "The Count of Monte-Cristo";
 
             ValidationResult result = validator.Validate(book);
             Assert.False(result.HasErrors);
@@ -180,6 +180,69 @@ namespace Lisa.Common.UnitTests
             Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
         }
 
+        [Fact]
+        public void ItSucceedsWhenIgnoredFieldIsSpecified()
+        {
+            dynamic model = new DynamicModel();
+            model.Registered = DateTime.UtcNow;
+            model.FirstName = "Alexandre";
+            model.LastName = "Dumas";
+
+            var validator = new PersonValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItSucceedsWhenIgnoredFieldIsMissing()
+        {
+            dynamic model = new DynamicModel();
+            model.FirstName = "Alexandre";
+            model.LastName = "Dumas";
+
+            var validator = new PersonValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItThrowsWhenAnIgnoredFieldGetsMarkedRequired()
+        {
+            var validator = new IgnoreRequiredValidator();
+            var model = new DynamicModel();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
+        }
+
+        [Fact]
+        public void ItThrowsWhenAnIgnoredFieldGetsMarkedOptional()
+        {
+            var validator = new IgnoreOptionalValidator();
+            var model = new DynamicModel();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
+        }
+
+        [Fact]
+        public void ItThrowsWhenAnRequiredFieldGetsMarkedIgnored()
+        {
+            var validator = new RequiredIgnoreValidator();
+            var model = new DynamicModel();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
+        }
+
+        [Fact]
+        public void ItThrowsWhenAnOptionalFieldGetsMarkedIgnored()
+        {
+            var validator = new OptionalIgnoreValidator();
+            var model = new DynamicModel();
+
+            Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -213,6 +276,7 @@ namespace Lisa.Common.UnitTests
     {
         protected override void ValidateModel()
         {
+            Ignore("registered");
             Required("firstName");
             Required("lastName");
         }
@@ -233,6 +297,42 @@ namespace Lisa.Common.UnitTests
         {
             Required("fact");
             Optional("fact");
+        }
+    }
+
+    public class IgnoreRequiredValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Ignore("this");
+            Required("this");
+        }
+    }
+
+    public class IgnoreOptionalValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Ignore("this");
+            Optional("this");
+        }
+    }
+
+    public class RequiredIgnoreValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("this");
+            Ignore("this");
+        }
+    }
+
+    public class OptionalIgnoreValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Optional("this");
+            Ignore("this");
         }
     }
 

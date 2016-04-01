@@ -13,6 +13,7 @@ namespace Lisa.Common.WebApi
         public abstract void Validate(Validator validator);
         public abstract void Required(string fieldName, params Action<string, object>[] validationFunctions);
         public abstract void Optional(string fieldName, params Action<string, object>[] validationFunctions);
+        public abstract void Ignore(string fieldName);
         public abstract void Allow(string fieldName);
     }
 }

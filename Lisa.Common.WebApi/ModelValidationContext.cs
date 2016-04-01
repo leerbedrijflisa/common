@@ -54,6 +54,11 @@ namespace Lisa.Common.WebApi
             ValidateField(fieldName, validationFunctions);
         }
 
+        public override void Ignore(string fieldName)
+        {
+            // Intentionally empty. What did you expect from a function called Ignore?
+        }
+
         public override void Allow(string fieldName)
         {
             throw new InvalidOperationException("Calling Allow() is not valid inside ValidateModel().");

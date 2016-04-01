@@ -69,6 +69,11 @@ namespace Lisa.Common.WebApi
             throw new InvalidOperationException("Calling Optional() is not valid inside ValidatePatch()");
         }
 
+        public override void Ignore(string fieldName)
+        {
+            throw new InvalidOperationException("Calling Ignore() is not valid inside ValidatePatch()");
+        }
+
         private void ValidateField(string fieldName, Action<string, object>[] validationFunctions)
         {
             if (string.Equals(Property.Key, fieldName, StringComparison.OrdinalIgnoreCase))
