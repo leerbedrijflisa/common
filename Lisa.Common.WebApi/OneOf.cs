@@ -8,6 +8,11 @@ namespace Lisa.Common.WebApi
     {
         protected virtual Action<string, object> OneOf(params string[] accepted)
         {
+            return OneOf(ValidationOptions.CaseInsensitive, accepted);
+        }
+
+        protected virtual Action<string, object> OneOf(ValidationOptions options, params string[] accepted)
+        {
             return (fieldName, value) =>
             {
                 if (value == null)
@@ -21,9 +26,15 @@ namespace Lisa.Common.WebApi
                     values = new[] { value };
                 }
 
+                var comparer = StringComparer.OrdinalIgnoreCase;
+                if ((options & ValidationOptions.CaseSensitive) != 0)
+                {
+                    comparer = StringComparer.Ordinal;
+                }
+
                 foreach (object v in values)
                 {
-                    if (!accepted.Contains(v.ToString(), StringComparer.OrdinalIgnoreCase))
+                    if (!accepted.Contains(v.ToString(), comparer))
                     {
                         var error = Error.IncorrectValue(fieldName, accepted, v);
                         Result.Errors.Add(error);

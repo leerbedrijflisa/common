@@ -257,6 +257,26 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.False(result.HasErrors);
         }
 
+        [Fact]
+        public void ItHasTheOptionToBeCaseSensitive()
+        {
+            dynamic model = new DynamicModel();
+            model.Rating = "pass";
+
+            var validator = new OneOfCaseSensitiveStringValidator();
+            ValidationResult result = validator.Validate((DynamicModel) model);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            var values = (string[]) AnonymousField(error.Values, "Allowed");
+            Assert.Equal(ErrorCode.IncorrectValue, error.Code);
+            Assert.Contains("good", values);
+            Assert.Contains("okay", values);
+            Assert.Contains("bad", values);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -270,6 +290,14 @@ namespace Lisa.Common.UnitTests.WebApi
         protected override void ValidateModel()
         {
             Required("rating", OneOf("good", "okay", "bad"));
+        }
+    }
+
+    class OneOfCaseSensitiveStringValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("rating", OneOf(ValidationOptions.CaseSensitive, "good", "okay", "bad"));
         }
     }
 
