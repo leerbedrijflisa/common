@@ -32,7 +32,7 @@ namespace Lisa.Common.WebApi
             };
         }
 
-        protected virtual Action<string, object> OneOf(params double[] values)
+        protected virtual Action<string, object> OneOf(params double[] accepted)
         {
             return (fieldName, value) =>
             {
@@ -41,35 +41,44 @@ namespace Lisa.Common.WebApi
                     return;
                 }
 
-                double convertedValue;
-                if (value is double)
+                IList values = value as IList;
+                if (values == null)
                 {
-                    convertedValue = (double) value;
-                }
-                else if (value is int)
-                {
-                    convertedValue = (int) value;
-                }
-                else if (value is float)
-                {
-                    convertedValue = (float) value;
-                }
-                else if (value is decimal)
-                {
-                    convertedValue = decimal.ToDouble((decimal) value);
-                }
-                else
-                {
-                    var error = Error.IncorrectValue(fieldName, values, value);
-                    Result.Errors.Add(error);
-                    return;
+                    values = new[] { value };
                 }
 
-                double variance = Math.Pow(10, -8);
-                if (!values.Any(v => Math.Abs(convertedValue - v) < variance))
+                foreach (var v in values)
                 {
-                    var error = Error.IncorrectValue(fieldName, values, convertedValue);
-                    Result.Errors.Add(error);
+                    double convertedValue;
+                    if (v is double)
+                    {
+                        convertedValue = (double) v;
+                    }
+                    else if (v is int)
+                    {
+                        convertedValue = (int) v;
+                    }
+                    else if (v is float)
+                    {
+                        convertedValue = (float) v;
+                    }
+                    else if (v is decimal)
+                    {
+                        convertedValue = decimal.ToDouble((decimal) v);
+                    }
+                    else
+                    {
+                        var error = Error.IncorrectValue(fieldName, accepted, v);
+                        Result.Errors.Add(error);
+                        return;
+                    }
+
+                    double variance = Math.Pow(10, -8);
+                    if (!accepted.Any(val => Math.Abs(convertedValue - val) < variance))
+                    {
+                        var error = Error.IncorrectValue(fieldName, accepted, convertedValue);
+                        Result.Errors.Add(error);
+                    }
                 }
             };
         }
