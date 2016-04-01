@@ -21,9 +21,9 @@ namespace Lisa.Common.WebApi
                     values = new[] { value };
                 }
 
-                foreach (var v in values)
+                foreach (object v in values)
                 {
-                    if (!accepted.Contains(v))
+                    if (!accepted.Contains(v.ToString(), StringComparer.OrdinalIgnoreCase))
                     {
                         var error = Error.IncorrectValue(fieldName, accepted, v);
                         Result.Errors.Add(error);

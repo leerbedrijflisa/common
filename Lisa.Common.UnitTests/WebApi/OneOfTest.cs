@@ -245,6 +245,18 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Contains(1, values);
         }
 
+        [Fact]
+        public void ItIsCaseInsensitiveByDefault()
+        {
+            dynamic model = new DynamicModel();
+            model.Rating = "GooD";
+
+            var validator = new OneOfStringValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
