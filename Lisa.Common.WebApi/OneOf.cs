@@ -1,18 +1,33 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 
 namespace Lisa.Common.WebApi
 {
     public partial class Validator
     {
-        protected virtual Action<string, object> OneOf(params string[] values)
+        protected virtual Action<string, object> OneOf(params string[] accepted)
         {
             return (fieldName, value) =>
             {
-                if (value != null && !values.Contains(value))
+                if (value == null)
                 {
-                    var error = Error.IncorrectValue(fieldName, values, value);
-                    Result.Errors.Add(error);
+                    return;
+                }
+
+                IList values = value as IList;
+                if (values == null)
+                {
+                    values = new[] { value };
+                }
+
+                foreach (var v in values)
+                {
+                    if (!accepted.Contains(v))
+                    {
+                        var error = Error.IncorrectValue(fieldName, accepted, v);
+                        Result.Errors.Add(error);
+                    }
                 }
             };
         }

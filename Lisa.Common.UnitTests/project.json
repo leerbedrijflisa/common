@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "Lisa.Common.Sql": "1.0.0-*",
-    "Lisa.Common.WebApi": "1.0.0-*",
+    "Lisa.Common.WebApi": "3.0.0-*",
     "xunit": "2.1.0",
     "xunit.runner.dnx": "2.1.0-*"
   },

@@ -177,6 +177,39 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Contains(1, values);
         }
 
+        [Fact]
+        public void ItAcceptsAnArrayOfMatchingStrings()
+        {
+            dynamic model = new DynamicModel();
+            model.Rating = new string[] { "good", "bad", "good", "okay", "bad" };
+
+            var validator = new OneOfStringValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItReportsANonMatchingStringInAnArray()
+        {
+            dynamic model = new DynamicModel();
+            model.Rating = new[] { "good", "pass", "bad" };
+
+            var validator = new OneOfStringValidator();
+            ValidationResult result = validator.Validate((DynamicModel) model);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            var values = (string[]) AnonymousField(error.Values, "Allowed");
+            Assert.Equal(ErrorCode.IncorrectValue, error.Code);
+            Assert.Equal("pass", AnonymousField(error.Values, "Actual"));
+            Assert.Contains("good", values);
+            Assert.Contains("okay", values);
+            Assert.Contains("bad", values);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
