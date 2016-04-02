@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Lisa.Common.WebApi
 {
@@ -148,42 +149,76 @@ namespace Lisa.Common.WebApi
             };
         }
 
-        internal static Error InvalidType(string field, DataType accepted, DataType actual)
+        internal static Error InvalidType(string field, DataTypes accepted, DataTypes actual)
         {
-            string acceptedType = DataTypeToString(accepted);
-            string actualType = DataTypeToString(actual);
+            object acceptedType = ConvertDataType(accepted);
+            object actualType = ConvertDataType(actual);
 
-            return new Error
+            
+            if (acceptedType is string)
             {
-                Code = ErrorCode.InvalidType,
-                Message = $"The value of field '{field}' should be of type '{acceptedType}', but is of type '{actualType}'.",
-                Values = new
+                return new Error
                 {
-                    Field = field,
-                    Accepted = acceptedType,
-                    Actual = actualType
-                }
-            };
+                    Code = ErrorCode.InvalidType,
+                    Message = $"The value of field '{field}' should be of type '{acceptedType}', but is of type '{actualType}'.",
+                    Values = new
+                    {
+                        Field = field,
+                        Accepted = acceptedType,
+                        Actual = actualType
+                    }
+                };
+            }
+            else
+            {
+                string acceptedTypes;
+                acceptedTypes = string.Join(", ", acceptedType);
+
+                return new Error
+                {
+                    Code = ErrorCode.InvalidType,
+                    Message = $"The value of field '{field}' is of type '{actualType}', but should be of one of the following types: {acceptedTypes}.",
+                    Values = new
+                    {
+                        Field = field,
+                        Accepted = acceptedType,
+                        Actual = actualType
+                    }
+                };
+            }
         }
 
-        private static string DataTypeToString(DataType type)
+        private static object ConvertDataType(DataTypes type)
         {
-            switch (type)
+            var types = new List<string>();
+
+            if ((type & DataTypes.String) != 0)
             {
-                case DataType.String:
-                    return "string";
+                types.Add("string");
+            }
 
-                case DataType.Number:
-                    return "number";
+            if ((type & DataTypes.Number) != 0)
+            {
+                types.Add("number");
+            }
 
-                case DataType.Boolean:
-                    return "boolean";
+            if ((type & DataTypes.Boolean) != 0)
+            {
+                types.Add("boolean");
+            }
 
-                case DataType.Array:
-                    return "array";
+            if ((type & DataTypes.Array) != 0)
+            {
+                types.Add("array");
+            }
 
-                default:
-                    throw new ArgumentOutOfRangeException();
+            if (types.Count == 1)
+            {
+                return types[0];
+            }
+            else
+            {
+                return types.ToArray();
             }
         }
     }

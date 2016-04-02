@@ -143,6 +143,39 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.False(result.HasErrors);
         }
 
+        [Fact]
+        public void ItAcceptsIfTypeMatchesAnyOfMany()
+        {
+            dynamic model = new DynamicModel();
+            model.Age = "old";
+
+            var validator = new IsOneOfManyValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItRejectsIfTypeMatchesNoneOfMany()
+        {
+            dynamic model = new DynamicModel();
+            model.Age = true;
+
+            var validator = new IsOneOfManyValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            var accepted = (string[]) AnonymousField(error.Values, "Accepted");
+            Assert.Equal(ErrorCode.InvalidType, error.Code);
+            Assert.Equal("Age", AnonymousField(error.Values, "Field"));
+            Assert.Equal("boolean", AnonymousField(error.Values, "Actual"));
+            Assert.Contains("string", accepted);
+            Assert.Contains("number", accepted);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -155,7 +188,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Optional("name", HasType(DataType.String));
+            Optional("name", HasType(DataTypes.String));
         }
     }
 
@@ -163,7 +196,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("age", HasType(DataType.Number));
+            Required("age", HasType(DataTypes.Number));
         }
     }
 
@@ -171,7 +204,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("isNice", HasType(DataType.Boolean));
+            Required("isNice", HasType(DataTypes.Boolean));
         }
     }
 
@@ -179,7 +212,15 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("traits", HasType(DataType.Array));
+            Required("traits", HasType(DataTypes.Array));
+        }
+    }
+
+    class IsOneOfManyValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("age", HasType(DataTypes.Number | DataTypes.String));
         }
     }
 }

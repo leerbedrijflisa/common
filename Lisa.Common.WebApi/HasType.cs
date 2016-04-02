@@ -5,7 +5,7 @@ namespace Lisa.Common.WebApi
 {
     public partial class Validator
     {
-        protected virtual Action<string, object> HasType(DataType accepted)
+        protected virtual Action<string, object> HasType(DataTypes accepted)
         {
             return (fieldName, value) =>
             {
@@ -14,9 +14,9 @@ namespace Lisa.Common.WebApi
                     return;
                 }
 
-                DataType actual = GetDataType(value);
+                DataTypes actual = GetDataType(value);
 
-                if (accepted != actual)
+                if ((actual & accepted) == 0)
                 {
                     var error = Error.InvalidType(fieldName, accepted, actual);
                     Result.Errors.Add(error);
@@ -24,29 +24,29 @@ namespace Lisa.Common.WebApi
             };
         }
 
-        private DataType GetDataType(object value)
+        private DataTypes GetDataType(object value)
         {
             if (value is string)
             {
-                return DataType.String;
+                return DataTypes.String;
             }
 
             if (value is int || value is float || value is double)
             {
-                return DataType.Number;
+                return DataTypes.Number;
             }
 
             if (value is bool)
             {
-                return DataType.Boolean;
+                return DataTypes.Boolean;
             }
 
             if (value is IList)
             {
-                return DataType.Array;
+                return DataTypes.Array;
             }
 
-            return DataType.Unknown;
+            return DataTypes.Unknown;
         }
     }
 }
