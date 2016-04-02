@@ -9,6 +9,11 @@ namespace Lisa.Common.WebApi
         {
             return (fieldName, value) =>
             {
+                if (value == null)
+                {
+                    return;
+                }
+
                 DataType actual = GetDataType(value);
 
                 if (accepted != actual)

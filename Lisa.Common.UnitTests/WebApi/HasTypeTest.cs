@@ -131,6 +131,18 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal("string", AnonymousField(error.Values, "Actual"));
         }
 
+        [Fact]
+        public void ItIgnoresNull()
+        {
+            dynamic model = new DynamicModel();
+            model.Name = null;
+
+            var validator = new IsStringValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
