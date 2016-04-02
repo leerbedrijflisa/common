@@ -11,7 +11,7 @@ namespace Lisa.Common.UnitTests.WebApi
         public void ItAcceptsAString()
         {
             dynamic model = new DynamicModel();
-            model.Name = "Rimpelstiltskin";
+            model.Name = "Rumpelstiltskin";
 
             var validator = new IsStringValidator();
             ValidationResult result = validator.Validate(model);
@@ -61,7 +61,7 @@ namespace Lisa.Common.UnitTests.WebApi
         public void ItRejectsAnArrayAsAString()
         {
             dynamic model = new DynamicModel();
-            model.Name = new string[] { "Rimpelstiltskin" };
+            model.Name = new string[] { "Rumpelstiltskin" };
 
             var validator = new IsStringValidator();
             ValidationResult result = validator.Validate(model);
@@ -74,6 +74,61 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal("Name", AnonymousField(error.Values, "Field"));
             Assert.Equal("string", AnonymousField(error.Values, "Accepted"));
             Assert.Equal("array", AnonymousField(error.Values, "Actual"));
+        }
+
+        [Fact]
+        public void ItAcceptsANumber()
+        {
+            dynamic model = new DynamicModel();
+            model.Age = 325;
+
+            var validator = new IsNumberValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItAcceptsABool()
+        {
+            dynamic model = new DynamicModel();
+            model.IsNice = false;
+
+            var validator = new IsBooleanValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItAcceptsAnArray()
+        {
+            dynamic model = new DynamicModel();
+            model.Traits = new string[] { "secretive", "conniving" };
+
+            var validator = new IsArrayValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItRejectsAStringAsANumber()
+        {
+            dynamic model = new DynamicModel();
+            model.Age = "old";
+
+            var validator = new IsNumberValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.InvalidType, error.Code);
+            Assert.Equal("Age", AnonymousField(error.Values, "Field"));
+            Assert.Equal("number", AnonymousField(error.Values, "Accepted"));
+            Assert.Equal("string", AnonymousField(error.Values, "Actual"));
         }
 
         private object AnonymousField(object obj, string fieldName)
@@ -89,6 +144,30 @@ namespace Lisa.Common.UnitTests.WebApi
         protected override void ValidateModel()
         {
             Optional("name", HasType(DataType.String));
+        }
+    }
+
+    class IsNumberValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("age", HasType(DataType.Number));
+        }
+    }
+
+    class IsBooleanValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("isNice", HasType(DataType.Boolean));
+        }
+    }
+
+    class IsArrayValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("traits", HasType(DataType.Array));
         }
     }
 }
