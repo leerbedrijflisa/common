@@ -1,4 +1,6 @@
-﻿namespace Lisa.Common.WebApi
+﻿using System;
+
+namespace Lisa.Common.WebApi
 {
     public class Error
     {
@@ -144,6 +146,45 @@
                     Actual = actual
                 }
             };
+        }
+
+        internal static Error InvalidType(string field, DataType accepted, DataType actual)
+        {
+            string acceptedType = DataTypeToString(accepted);
+            string actualType = DataTypeToString(actual);
+
+            return new Error
+            {
+                Code = ErrorCode.InvalidType,
+                Message = $"The value of field '{field}' should be of type '{acceptedType}', but is of type '{actualType}'.",
+                Values = new
+                {
+                    Field = field,
+                    Accepted = acceptedType,
+                    Actual = actualType
+                }
+            };
+        }
+
+        private static string DataTypeToString(DataType type)
+        {
+            switch (type)
+            {
+                case DataType.String:
+                    return "string";
+
+                case DataType.Number:
+                    return "number";
+
+                case DataType.Boolean:
+                    return "boolean";
+
+                case DataType.Array:
+                    return "array";
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }
