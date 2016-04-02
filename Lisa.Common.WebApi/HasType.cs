@@ -18,8 +18,28 @@ namespace Lisa.Common.WebApi
 
                 if ((actual & accepted) == 0)
                 {
-                    var error = Error.InvalidType(fieldName, accepted, actual);
+                    var error = Error.InvalidType(fieldName, value, accepted, actual);
                     Result.Errors.Add(error);
+                }
+            };
+        }
+
+        protected virtual Action<string, object> IsArray(DataTypes accepted)
+        {
+            return (fieldName, value) =>
+            {
+                DataTypes actual = GetDataType(value);
+                if ((actual & DataTypes.Array) == 0)
+                {
+                    var error = Error.InvalidType(fieldName, value, accepted, actual);
+                    Result.Errors.Add(error);
+                    return;
+                }
+
+                var hasType = HasType(accepted);
+                foreach (var element in (IEnumerable) value)
+                {
+                    hasType(fieldName, element);
                 }
             };
         }

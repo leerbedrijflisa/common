@@ -149,7 +149,7 @@ namespace Lisa.Common.WebApi
             };
         }
 
-        internal static Error InvalidType(string field, DataTypes accepted, DataTypes actual)
+        internal static Error InvalidType(string field, object value, DataTypes accepted, DataTypes actual)
         {
             object acceptedType = ConvertDataType(accepted);
             object actualType = ConvertDataType(actual);
@@ -165,7 +165,8 @@ namespace Lisa.Common.WebApi
                     {
                         Field = field,
                         Accepted = acceptedType,
-                        Actual = actualType
+                        Actual = actualType,
+                        Value = value
                     }
                 };
             }
@@ -182,7 +183,8 @@ namespace Lisa.Common.WebApi
                     {
                         Field = field,
                         Accepted = acceptedType,
-                        Actual = actualType
+                        Actual = actualType,
+                        Value = value
                     }
                 };
             }
