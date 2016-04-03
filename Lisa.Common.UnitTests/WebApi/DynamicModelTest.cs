@@ -1,5 +1,5 @@
 ﻿using Lisa.Common.WebApi;
-using Microsoft.CSharp.RuntimeBinder;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Xunit;
 
@@ -136,6 +136,27 @@ namespace Lisa.Common.UnitTests
         {
             dynamic model = new DynamicModel();
             Assert.Null(model.Absent);
+        }
+
+        [Fact]
+        public void ItProvidesReadAccessToNestedPropertiesThroughAnIndexer()
+        {
+            dynamic model = new DynamicModel();
+            model.Foo = new
+            {
+                Bar = "foobar"
+            };
+
+            Assert.Equal("foobar", (string) model["Foo.Bar"]);
+        }
+
+        [Fact]
+        public void ItProvidesReadAccessToNestedJsonPropertiesThroughAnIndexer()
+        {
+            dynamic model = new DynamicModel();
+            model.Json = JObject.Parse("{ foo: { bar: 'foobar' }}");
+
+            Assert.Equal("foobar", (string) model["Json.foo.bar"]);
         }
     }
 }
