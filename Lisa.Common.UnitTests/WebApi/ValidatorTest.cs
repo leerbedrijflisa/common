@@ -1,4 +1,5 @@
 ﻿using Lisa.Common.WebApi;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -243,6 +244,34 @@ namespace Lisa.Common.UnitTests
             Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
         }
 
+        [Fact]
+        public void ItSucceedsWhenNestedFieldIsSpecified()
+        {
+            var validator = new NestedValidator();
+            dynamic model = new DynamicModel();
+            model.User = new
+            {
+                Name = new
+                {
+                    First = "Alexandre"
+                }
+            };
+
+            ValidationResult result = validator.Validate(model);
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItSucceedsWhenNestedJsonFieldIsSpecified()
+        {
+            var validator = new NestedValidator();
+            dynamic model = new DynamicModel();
+            model.User = JObject.Parse("{ name: { first: 'Alexandre' } }");
+
+            ValidationResult result = validator.Validate(model);
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -365,6 +394,14 @@ namespace Lisa.Common.UnitTests
         protected override void ValidateModel()
         {
             var result = Result;
+        }
+    }
+
+    public class NestedValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("user.name.first");
         }
     }
 }

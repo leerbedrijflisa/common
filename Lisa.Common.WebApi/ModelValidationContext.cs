@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Lisa.Common.WebApi
 {
@@ -27,13 +34,16 @@ namespace Lisa.Common.WebApi
         {
             foreach (var property in Model.Properties)
             {
-                Property = property;
-                validator.ValidateModel();
-
-                if (!_fieldTracker.Exists(property.Key))
+                foreach (var nestedProperty in GetNestedProperties(property))
                 {
-                    var error = Error.ExtraField(property.Key);
-                    Result.Errors.Add(error);
+                    Property = nestedProperty;
+                    validator.ValidateModel();
+
+                    if (!_fieldTracker.Exists(nestedProperty.Key))
+                    {
+                        var error = Error.ExtraField(nestedProperty.Key);
+                        Result.Errors.Add(error);
+                    }
                 }
             }
 
@@ -75,6 +85,63 @@ namespace Lisa.Common.WebApi
                     validationFunction(Property.Key, Property.Value);
                 }
             }
+        }
+
+        private IEnumerable<KeyValuePair<string, object>> GetNestedProperties(KeyValuePair<string, object> property)
+        {
+            if (property.Value is IDynamicMetaObjectProvider)
+            {
+                var expression = Expression.Variable(property.Value.GetType());
+                var nestedPropertyNames = ((IDynamicMetaObjectProvider) property.Value).GetMetaObject(expression).GetDynamicMemberNames();
+                if (nestedPropertyNames.Count() == 0)
+                {
+                    yield return property;
+                    yield break;
+                }
+
+                foreach (string nestedPropertyName in nestedPropertyNames)
+                {
+                    // Code adapted from http://stackoverflow.com/a/7108263
+                    var binder = Microsoft.CSharp.RuntimeBinder.Binder.GetMember(CSharpBinderFlags.None, nestedPropertyName, property.Value.GetType(), new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
+                    var callsite = CallSite<Func<CallSite, object, object>>.Create(binder);
+                    object value = callsite.Target(callsite, property.Value);
+                    string name = $"{property.Key}.{nestedPropertyName}";
+
+                    var nestedProperties = GetNestedProperties(new KeyValuePair<string, object>(name, value));
+                    foreach (var nestedProperty in nestedProperties)
+                    {
+                        yield return nestedProperty;
+                    }
+                }
+            }
+            else if (IsNestedType(property.Value))
+            {
+                var nestedPropertiesInfos = property.Value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (PropertyInfo nestedPropertyInfo in nestedPropertiesInfos)
+                {
+                    object value = nestedPropertyInfo.GetValue(property.Value);
+                    string name = $"{property.Key}.{nestedPropertyInfo.Name}";
+
+                    var nestedProperties = GetNestedProperties(new KeyValuePair<string, object>(name, value));
+                    foreach (var nestedProperty in nestedProperties)
+                    {
+                        yield return nestedProperty;
+                    }
+                }
+            }
+            else
+            {
+                yield return property;
+                yield break;
+            }
+        }
+
+        private bool IsNestedType(object value)
+        {
+            // Code adapted from http://stackoverflow.com/a/2483054
+            Type type = value.GetType();
+            return type.Name.Contains("AnonymousType") && type.Name.StartsWith("<>");
         }
 
         private FieldTracker _fieldTracker;
