@@ -203,7 +203,7 @@ namespace Lisa.Common.UnitTests.WebApi
                 Value = "A Clockwork Orange"
             };
 
-            ValidationResult result = validator.Validate(book);
+            ValidationResult result = validator.Validate(new Patch[] { patch }, book);
             Assert.False(result.HasErrors);
         }
 
