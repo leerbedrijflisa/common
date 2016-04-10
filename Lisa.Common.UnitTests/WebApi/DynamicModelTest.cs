@@ -182,5 +182,17 @@ namespace Lisa.Common.UnitTests
             Assert.Equal(42, model.Integer);
             Assert.Equal(new DateTime(2016, 4, 10, 10, 59, 38), model.Date);
         }
+
+        [Fact]
+        public void ItTranslatesJObjectsToNestedDynamicModels()
+        {
+            dynamic model = new DynamicModel();
+            model.Foo = JToken.Parse("{ text: 'bar', number: { floating: 40.2, whole: 42 } }");
+
+            Assert.IsType(typeof(DynamicModel), model.Foo);
+            Assert.Equal("bar", model.Foo.text);
+            Assert.Equal(40.2, model.Foo.number.floating);
+            Assert.Equal(42, model.Foo.number.whole);
+        }
     }
 }

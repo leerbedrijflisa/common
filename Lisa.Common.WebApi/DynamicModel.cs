@@ -38,11 +38,11 @@ namespace Lisa.Common.WebApi
 
                 if (property.Key == null)
                 {
-                    Properties.Add(name, value);
+                    Properties.Add(name, NormalizeValue(value));
                 }
                 else
                 {
-                    Properties[property.Key] = value;
+                    Properties[property.Key] = NormalizeValue(value);
                 }
             }
         }
@@ -71,15 +71,7 @@ namespace Lisa.Common.WebApi
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            if (value is JValue)
-            {
-                Properties[binder.Name] = FromJValue((JValue) value);
-            }
-            else
-            {
-                Properties[binder.Name] = value;
-            }
-
+            Properties[binder.Name] = NormalizeValue(value);
             return true;
         }
 
@@ -103,6 +95,25 @@ namespace Lisa.Common.WebApi
             {
                 Properties.Add(property.Key, property.Value);
             }
+        }
+
+        private object NormalizeValue(object value)
+        {
+            if (value is JValue)
+            {
+                return FromJValue((JValue) value);
+            }
+            else if (value is JObject)
+            {
+                var nestedModel = new DynamicModel();
+                foreach (JProperty child in ((JObject) value).Properties())
+                {
+                    nestedModel[child.Name] = child.Value;
+                }
+                return nestedModel;
+            }
+
+            return value;
         }
 
         private object GetValueOfNestedProperty(string propertyName, object obj)
