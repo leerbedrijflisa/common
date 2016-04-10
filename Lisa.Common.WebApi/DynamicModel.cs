@@ -172,6 +172,10 @@ namespace Lisa.Common.WebApi
                 case JTokenType.Integer:
                     return value.Value<int>();
 
+                case JTokenType.Null:
+                case JTokenType.Undefined:
+                    return null;
+
                 default:
                     throw new ArgumentOutOfRangeException("value");
             }

@@ -194,5 +194,16 @@ namespace Lisa.Common.UnitTests
             Assert.Equal(40.2, model.Foo.number.floating);
             Assert.Equal(42, model.Foo.number.whole);
         }
+
+        [Fact]
+        public void ItTranslatesJsonNullsAndUndefinedsIntoNull()
+        {
+            dynamic model = new DynamicModel();
+            model.Nothing = JToken.Parse("null");
+            model.LessThanNothing = JToken.Parse("undefined");
+
+            Assert.Null(model.Nothing);
+            Assert.Null(model.LessThanNothing);
+        }
     }
 }

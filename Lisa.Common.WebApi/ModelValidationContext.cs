@@ -89,6 +89,11 @@ namespace Lisa.Common.WebApi
 
         private IEnumerable<KeyValuePair<string, object>> GetNestedProperties(KeyValuePair<string, object> property)
         {
+            if (property.Value == null)
+            {
+                yield return property;
+                yield break;
+            }
             if (property.Value is IDynamicMetaObjectProvider)
             {
                 var expression = Expression.Variable(property.Value.GetType());

@@ -272,6 +272,18 @@ namespace Lisa.Common.UnitTests
             Assert.False(result.HasErrors);
         }
 
+        [Fact]
+        public void ItSucceedsWhenNestedFieldIsNull()
+        {
+            var validator = new NestedValidator();
+            dynamic model = new DynamicModel();
+            model.User = JObject.Parse("{ name: { first: null } }");
+
+            ValidationResult result = validator.Validate(model);
+            Assert.False(result.HasErrors);
+            Assert.Null(model.User.name.first);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
