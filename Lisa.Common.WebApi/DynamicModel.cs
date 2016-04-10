@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 
 namespace Lisa.Common.WebApi
 {
@@ -70,7 +71,15 @@ namespace Lisa.Common.WebApi
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            Properties[binder.Name] = value;
+            if (value is JValue)
+            {
+                Properties[binder.Name] = FromJValue((JValue) value);
+            }
+            else
+            {
+                Properties[binder.Name] = value;
+            }
+
             return true;
         }
 
@@ -131,6 +140,30 @@ namespace Lisa.Common.WebApi
 
             string subPropertyName = propertyName.Substring(dotPosition + 1);
             return GetValueOfNestedProperty(subPropertyName, value);
+        }
+
+        private object FromJValue(JValue value)
+        {
+            switch (value.Type)
+            {
+                case JTokenType.String:
+                    return value.Value<string>();
+
+                case JTokenType.Float:
+                    return value.Value<double>();
+
+                case JTokenType.Boolean:
+                    return value.Value<bool>();
+
+                case JTokenType.Date:
+                    return value.Value<DateTime>();
+
+                case JTokenType.Integer:
+                    return value.Value<int>();
+
+                default:
+                    throw new ArgumentOutOfRangeException("value");
+            }
         }
 
         private object _metadata;
