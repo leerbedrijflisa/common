@@ -112,6 +112,15 @@ namespace Lisa.Common.WebApi
                 }
                 return nestedModel;
             }
+            else if (value is JArray)
+            {
+                var list = new List<object>();
+                foreach (var item in ((JArray) value).Children())
+                {
+                    list.Add(NormalizeValue(item));
+                }
+                return list.ToArray();
+            }
 
             return value;
         }

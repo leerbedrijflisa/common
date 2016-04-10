@@ -1,6 +1,7 @@
 ﻿using Lisa.Common.WebApi;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Xunit;
 
@@ -204,6 +205,15 @@ namespace Lisa.Common.UnitTests
 
             Assert.Null(model.Nothing);
             Assert.Null(model.LessThanNothing);
+        }
+
+        [Fact]
+        public void ItTranslatesJArrayToArray()
+        {
+            dynamic model = new DynamicModel();
+            model.Foo = JToken.Parse("[ { bar: 40 }, { bar: 2 } ]");
+
+            Assert.Equal(2, ((ICollection) model.Foo).Count);
         }
     }
 }
