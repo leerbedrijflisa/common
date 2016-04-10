@@ -415,5 +415,10 @@ namespace Lisa.Common.UnitTests
         {
             Required("user.name.first");
         }
+
+        protected override void ValidatePatch()
+        {
+            Allow("user.name.first");
+        }
     }
 }
