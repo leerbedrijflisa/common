@@ -1,5 +1,6 @@
 ﻿using Microsoft.CSharp.RuntimeBinder;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -92,9 +93,21 @@ namespace Lisa.Common.WebApi
             if (property.Value == null)
             {
                 yield return property;
-                yield break;
             }
-            if (property.Value is IDynamicMetaObjectProvider)
+            else if (property.Value is ICollection) // NOTE: IEnumerable doesn't work because string is also IEnumerable
+            {
+                yield return property;
+
+                foreach (var item in (IEnumerable) property.Value)
+                {
+                    var nestedProperties = GetNestedProperties(new KeyValuePair<string, object>(property.Key, item));
+                    foreach (var nestedProperty in nestedProperties)
+                    {
+                        yield return nestedProperty;
+                    }
+                }
+            }
+            else if (property.Value is IDynamicMetaObjectProvider)
             {
                 var expression = Expression.Variable(property.Value.GetType());
                 var nestedPropertyNames = ((IDynamicMetaObjectProvider) property.Value).GetMetaObject(expression).GetDynamicMemberNames();
@@ -138,7 +151,6 @@ namespace Lisa.Common.WebApi
             else
             {
                 yield return property;
-                yield break;
             }
         }
 
