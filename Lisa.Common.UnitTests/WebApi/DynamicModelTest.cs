@@ -1,5 +1,7 @@
 ﻿using Lisa.Common.WebApi;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using Xunit;
 
@@ -157,6 +159,61 @@ namespace Lisa.Common.UnitTests
             model.Json = JObject.Parse("{ foo: { bar: 'foobar' }}");
 
             Assert.Equal("foobar", (string) model["Json.foo.bar"]);
+        }
+
+        [Fact]
+        public void ItTranslatesJValuesToBuiltInTypes()
+        {
+            dynamic model = new DynamicModel();
+            model.Text = JValue.Parse("'foo'");
+            model.Number = JValue.Parse("40.2");
+            model.Boolean = JValue.Parse("true");
+            model.Integer = JValue.Parse("42");
+            model.Date = JValue.Parse("'2016-04-10T10:59:38Z'");
+
+            Assert.IsType(typeof(string), model.Text);
+            Assert.IsType(typeof(double), model.Number);
+            Assert.IsType(typeof(bool), model.Boolean);
+            Assert.IsType(typeof(int), model.Integer);
+            Assert.IsType(typeof(DateTime), model.Date);
+
+            Assert.Equal("foo", model.Text);
+            Assert.Equal(40.2, model.Number);
+            Assert.Equal(true, model.Boolean);
+            Assert.Equal(42, model.Integer);
+            Assert.Equal(new DateTime(2016, 4, 10, 10, 59, 38), model.Date);
+        }
+
+        [Fact]
+        public void ItTranslatesJObjectsToNestedDynamicModels()
+        {
+            dynamic model = new DynamicModel();
+            model.Foo = JToken.Parse("{ text: 'bar', number: { floating: 40.2, whole: 42 } }");
+
+            Assert.IsType(typeof(DynamicModel), model.Foo);
+            Assert.Equal("bar", model.Foo.text);
+            Assert.Equal(40.2, model.Foo.number.floating);
+            Assert.Equal(42, model.Foo.number.whole);
+        }
+
+        [Fact]
+        public void ItTranslatesJsonNullsAndUndefinedsIntoNull()
+        {
+            dynamic model = new DynamicModel();
+            model.Nothing = JToken.Parse("null");
+            model.LessThanNothing = JToken.Parse("undefined");
+
+            Assert.Null(model.Nothing);
+            Assert.Null(model.LessThanNothing);
+        }
+
+        [Fact]
+        public void ItTranslatesJArrayToArray()
+        {
+            dynamic model = new DynamicModel();
+            model.Foo = JToken.Parse("[ { bar: 40 }, { bar: 2 } ]");
+
+            Assert.Equal(2, ((ICollection) model.Foo).Count);
         }
     }
 }

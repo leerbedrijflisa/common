@@ -18,6 +18,7 @@
     }
   },
   "dependencies": {
-    "Microsoft.AspNet.Mvc.Core": "6.0.0-rc1-final"
+    "Microsoft.AspNet.Mvc.Core": "6.0.0-rc1-final",
+    "Newtonsoft.Json": "7.0.1"
   }
 }

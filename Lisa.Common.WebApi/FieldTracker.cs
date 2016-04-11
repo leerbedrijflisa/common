@@ -90,6 +90,11 @@ namespace Lisa.Common.WebApi
             AddStatus(fieldName, FieldStatus.Ignore);
         }
 
+        public void MarkSubField(string fieldName)
+        {
+            AddStatus(fieldName, FieldStatus.SubField);
+        }
+
         public void MarkPresent(string fieldName)
         {
             AddStatus(fieldName, FieldStatus.Present);

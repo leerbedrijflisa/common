@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 
 namespace Lisa.Common.WebApi
 {
@@ -37,11 +38,11 @@ namespace Lisa.Common.WebApi
 
                 if (property.Key == null)
                 {
-                    Properties.Add(name, value);
+                    Properties.Add(name, NormalizeValue(value));
                 }
                 else
                 {
-                    Properties[property.Key] = value;
+                    Properties[property.Key] = NormalizeValue(value);
                 }
             }
         }
@@ -70,7 +71,7 @@ namespace Lisa.Common.WebApi
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            Properties[binder.Name] = value;
+            Properties[binder.Name] = NormalizeValue(value);
             return true;
         }
 
@@ -94,6 +95,34 @@ namespace Lisa.Common.WebApi
             {
                 Properties.Add(property.Key, property.Value);
             }
+        }
+
+        private object NormalizeValue(object value)
+        {
+            if (value is JValue)
+            {
+                return FromJValue((JValue) value);
+            }
+            else if (value is JObject)
+            {
+                var nestedModel = new DynamicModel();
+                foreach (JProperty child in ((JObject) value).Properties())
+                {
+                    nestedModel[child.Name] = child.Value;
+                }
+                return nestedModel;
+            }
+            else if (value is JArray)
+            {
+                var list = new List<object>();
+                foreach (var item in ((JArray) value).Children())
+                {
+                    list.Add(NormalizeValue(item));
+                }
+                return list.ToArray();
+            }
+
+            return value;
         }
 
         private object GetValueOfNestedProperty(string propertyName, object obj)
@@ -131,6 +160,34 @@ namespace Lisa.Common.WebApi
 
             string subPropertyName = propertyName.Substring(dotPosition + 1);
             return GetValueOfNestedProperty(subPropertyName, value);
+        }
+
+        private object FromJValue(JValue value)
+        {
+            switch (value.Type)
+            {
+                case JTokenType.String:
+                    return value.Value<string>();
+
+                case JTokenType.Float:
+                    return value.Value<double>();
+
+                case JTokenType.Boolean:
+                    return value.Value<bool>();
+
+                case JTokenType.Date:
+                    return value.Value<DateTime>();
+
+                case JTokenType.Integer:
+                    return value.Value<int>();
+
+                case JTokenType.Null:
+                case JTokenType.Undefined:
+                    return null;
+
+                default:
+                    throw new ArgumentOutOfRangeException("value");
+            }
         }
 
         private object _metadata;
