@@ -1,4 +1,7 @@
-﻿namespace Lisa.Common.WebApi
+﻿using System;
+using System.Collections.Generic;
+
+namespace Lisa.Common.WebApi
 {
     public class Error
     {
@@ -144,6 +147,81 @@
                     Actual = actual
                 }
             };
+        }
+
+        internal static Error InvalidType(string field, object value, DataTypes accepted, DataTypes actual)
+        {
+            object acceptedType = ConvertDataType(accepted);
+            object actualType = ConvertDataType(actual);
+
+            
+            if (acceptedType is string)
+            {
+                return new Error
+                {
+                    Code = ErrorCode.InvalidType,
+                    Message = $"The value of field '{field}' should be of type '{acceptedType}', but is of type '{actualType}'.",
+                    Values = new
+                    {
+                        Field = field,
+                        Accepted = acceptedType,
+                        Actual = actualType,
+                        Value = value
+                    }
+                };
+            }
+            else
+            {
+                string acceptedTypes;
+                acceptedTypes = string.Join(", ", acceptedType);
+
+                return new Error
+                {
+                    Code = ErrorCode.InvalidType,
+                    Message = $"The value of field '{field}' is of type '{actualType}', but should be of one of the following types: {acceptedTypes}.",
+                    Values = new
+                    {
+                        Field = field,
+                        Accepted = acceptedType,
+                        Actual = actualType,
+                        Value = value
+                    }
+                };
+            }
+        }
+
+        private static object ConvertDataType(DataTypes type)
+        {
+            var types = new List<string>();
+
+            if ((type & DataTypes.String) != 0)
+            {
+                types.Add("string");
+            }
+
+            if ((type & DataTypes.Number) != 0)
+            {
+                types.Add("number");
+            }
+
+            if ((type & DataTypes.Boolean) != 0)
+            {
+                types.Add("boolean");
+            }
+
+            if ((type & DataTypes.Array) != 0)
+            {
+                types.Add("array");
+            }
+
+            if (types.Count == 1)
+            {
+                return types[0];
+            }
+            else
+            {
+                return types.ToArray();
+            }
         }
     }
 }
