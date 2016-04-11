@@ -9,6 +9,7 @@ namespace Lisa.Common.WebApi
         Optional = 2,
         Present = 4,
         Allowed = 8,
-        Ignore = 16
+        Ignore = 16,
+        SubField = 32
     }
 }

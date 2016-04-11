@@ -203,7 +203,31 @@ namespace Lisa.Common.UnitTests.WebApi
                 Value = "A Clockwork Orange"
             };
 
-            ValidationResult result = validator.Validate(book);
+            ValidationResult result = validator.Validate(new Patch[] { patch }, book);
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItAcceptsNestedFields()
+        {
+            var validator = new NestedValidator();
+            dynamic model = new DynamicModel();
+            model.user = new
+            {
+                Name = new
+                {
+                    First = "Ectimeroclast"
+                }
+            };
+
+            var patch = new Patch
+            {
+                Action = "replace",
+                Field = "user.name.first",
+                Value = "Gwaelofein"
+            };
+
+            ValidationResult result = validator.Validate(new Patch[] { patch }, model);
             Assert.False(result.HasErrors);
         }
 

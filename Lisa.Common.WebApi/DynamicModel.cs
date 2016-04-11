@@ -1,7 +1,11 @@
-﻿using System;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using Newtonsoft.Json.Linq;
 
 namespace Lisa.Common.WebApi
 {
@@ -15,6 +19,11 @@ namespace Lisa.Common.WebApi
         {
             get
             {
+                if (name.Contains("."))
+                {
+                    return GetValueOfNestedProperty(name, this);
+                }
+
                 var property = Properties.SingleOrDefault(p => string.Equals(p.Key, name, StringComparison.OrdinalIgnoreCase));
                 if (property.Key == null)
                 {
@@ -29,11 +38,11 @@ namespace Lisa.Common.WebApi
 
                 if (property.Key == null)
                 {
-                    Properties.Add(name, value);
+                    Properties.Add(name, NormalizeValue(value));
                 }
                 else
                 {
-                    Properties[property.Key] = value;
+                    Properties[property.Key] = NormalizeValue(value);
                 }
             }
         }
@@ -62,7 +71,7 @@ namespace Lisa.Common.WebApi
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            Properties[binder.Name] = value;
+            Properties[binder.Name] = NormalizeValue(value);
             return true;
         }
 
@@ -85,6 +94,99 @@ namespace Lisa.Common.WebApi
             foreach (var property in properties)
             {
                 Properties.Add(property.Key, property.Value);
+            }
+        }
+
+        private object NormalizeValue(object value)
+        {
+            if (value is JValue)
+            {
+                return FromJValue((JValue) value);
+            }
+            else if (value is JObject)
+            {
+                var nestedModel = new DynamicModel();
+                foreach (JProperty child in ((JObject) value).Properties())
+                {
+                    nestedModel[child.Name] = child.Value;
+                }
+                return nestedModel;
+            }
+            else if (value is JArray)
+            {
+                var list = new List<object>();
+                foreach (var item in ((JArray) value).Children())
+                {
+                    list.Add(NormalizeValue(item));
+                }
+                return list.ToArray();
+            }
+
+            return value;
+        }
+
+        private object GetValueOfNestedProperty(string propertyName, object obj)
+        {
+            if (obj == null || propertyName.Length == 0)
+            {
+                return obj;
+            }
+
+            string name;
+            int dotPosition = propertyName.IndexOf('.');
+            if (dotPosition < 0)
+            {
+                name = propertyName;
+                dotPosition = propertyName.Length - 1;
+            }
+            else
+            {
+                name = propertyName.Substring(0, dotPosition);
+            }
+
+            object value;
+            if (obj is IDynamicMetaObjectProvider)
+            {
+                // Code adapted from http://stackoverflow.com/a/7108263
+                var binder = Microsoft.CSharp.RuntimeBinder.Binder.GetMember(CSharpBinderFlags.None, name, obj.GetType(), new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
+                var callsite = CallSite<Func<CallSite, object, object>>.Create(binder);
+                value =  callsite.Target(callsite, obj);
+            }
+            else
+            {
+                var propertyInfo = obj.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
+                value = propertyInfo?.GetValue(obj);
+            }
+
+            string subPropertyName = propertyName.Substring(dotPosition + 1);
+            return GetValueOfNestedProperty(subPropertyName, value);
+        }
+
+        private object FromJValue(JValue value)
+        {
+            switch (value.Type)
+            {
+                case JTokenType.String:
+                    return value.Value<string>();
+
+                case JTokenType.Float:
+                    return value.Value<double>();
+
+                case JTokenType.Boolean:
+                    return value.Value<bool>();
+
+                case JTokenType.Date:
+                    return value.Value<DateTime>();
+
+                case JTokenType.Integer:
+                    return value.Value<int>();
+
+                case JTokenType.Null:
+                case JTokenType.Undefined:
+                    return null;
+
+                default:
+                    throw new ArgumentOutOfRangeException("value");
             }
         }
 

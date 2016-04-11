@@ -1,4 +1,5 @@
 ﻿using Lisa.Common.WebApi;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -243,11 +244,71 @@ namespace Lisa.Common.UnitTests
             Assert.Throws<InvalidOperationException>(() => validator.Validate(model));
         }
 
+        [Fact]
+        public void ItSucceedsWhenNestedFieldIsSpecified()
+        {
+            var validator = new NestedValidator();
+            dynamic model = new DynamicModel();
+            model.User = new
+            {
+                Name = new
+                {
+                    First = "Alexandre"
+                }
+            };
+
+            ValidationResult result = validator.Validate(model);
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItSucceedsWhenNestedJsonFieldIsSpecified()
+        {
+            var validator = new NestedValidator();
+            dynamic model = new DynamicModel();
+            model.User = JObject.Parse("{ name: { first: 'Alexandre' } }");
+
+            ValidationResult result = validator.Validate(model);
+            Assert.False(result.HasErrors);
+        }
+
+        [Fact]
+        public void ItSucceedsWhenNestedFieldIsNull()
+        {
+            var validator = new NestedValidator();
+            dynamic model = new DynamicModel();
+            model.User = JObject.Parse("{ name: { first: null } }");
+
+            ValidationResult result = validator.Validate(model);
+            Assert.False(result.HasErrors);
+            Assert.Null(model.User.name.first);
+        }
+
+        [Fact]
+        public void ItRunsValidationFunctionsOnFieldsNestedInAnArray()
+        {
+            var validator = new AuthorValidator();
+            dynamic model = new DynamicModel();
+            model.Authors = new[]
+            {
+                new { FirstName = "Alexandre", LastName = "Dumas" },
+                new { FirstName = "Anthony", LastName = "Burgess" },
+                new { FirstName = "Victor", LastName = "Hugo" }
+            };
+
+            ValidationResult result = validator.Validate(model);
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.TooShort, error.Code);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
             var propertyInfo = type.GetProperty(fieldName);
-            return propertyInfo.GetValue(obj);
+            return propertyInfo?.GetValue(obj);
         }
     }
 
@@ -365,6 +426,29 @@ namespace Lisa.Common.UnitTests
         protected override void ValidateModel()
         {
             var result = Result;
+        }
+    }
+
+    public class NestedValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("user.name.first");
+        }
+
+        protected override void ValidatePatch()
+        {
+            Allow("user.name.first");
+        }
+    }
+
+    public class AuthorValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("authors");
+            Optional("authors.firstName");
+            Required("authors.lastName", MinLength(5));
         }
     }
 }
