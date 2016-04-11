@@ -100,6 +100,11 @@ namespace Lisa.Common.WebApi
 
                 foreach (var item in (IEnumerable) property.Value)
                 {
+                    if (!IsNestedType(item))
+                    {
+                        continue;
+                    }
+
                     var nestedProperties = GetNestedProperties(new KeyValuePair<string, object>(property.Key, item));
                     foreach (var nestedProperty in nestedProperties)
                     {

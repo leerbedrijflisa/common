@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lisa.Common.WebApi
 {
@@ -44,6 +45,22 @@ namespace Lisa.Common.WebApi
                 Values = new
                 {
                     Field = field
+                }
+            };
+        }
+
+        internal static Error IncorrectValue<T>(string field, T[] allowed, object actual)
+        {
+            string values = string.Join(", ", allowed);
+            return new Error
+            {
+                Code = ErrorCode.IncorrectValue,
+                Message = $"The field '{field}' has value '{actual}', but should have one of the following values: {values}.",
+                Values = new
+                {
+                    Field = field,
+                    Allowed = allowed,
+                    Actual = actual
                 }
             };
         }
