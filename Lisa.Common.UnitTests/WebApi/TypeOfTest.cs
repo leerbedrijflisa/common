@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Lisa.Common.UnitTests.WebApi
 {
-    public class HasTypeTest
+    public class TypeOfTest
     {
         [Fact]
         public void ItAcceptsAString()
