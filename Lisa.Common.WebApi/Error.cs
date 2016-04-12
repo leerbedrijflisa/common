@@ -207,6 +207,21 @@ namespace Lisa.Common.WebApi
             }
         }
 
+        internal static Error NoMatch(string fieldName, object value, string pattern)
+        {
+            return new Error
+            {
+                Code = ErrorCode.NoMatch,
+                Message = $"The value of field '{fieldName}' should match the pattern '{pattern}'.",
+                Values = new
+                {
+                    Field = fieldName,
+                    Value = value,
+                    Pattern = pattern
+                }
+            };
+        }
+
         private static object ConvertDataType(DataTypes type)
         {
             var types = new List<string>();

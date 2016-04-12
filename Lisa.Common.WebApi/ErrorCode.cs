@@ -21,6 +21,7 @@
         public static int TooLong        { get; } = 0x0006 << 15;
         public static int IncorrectValue { get; } = 0x0007 << 15;
         public static int InvalidType    { get; } = 0x0008 << 15;
+        public static int NoMatch        { get; } = 0x0009 << 15;
 
         // Patch validation errors
         public static int InvalidAction   { get; } = 0x0100 << 15;
