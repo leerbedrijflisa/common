@@ -322,6 +322,18 @@ namespace Lisa.Common.UnitTests
             Assert.Equal(ErrorCode.TooShort, error.Code);
         }
 
+        [Fact]
+        public void ItAcceptsNullValuesInArrays()
+        {
+            dynamic model = new DynamicModel();
+            model.Numbers = new object[] { 3, 2, 1, null };
+
+            var validator = new ArrayValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -467,6 +479,14 @@ namespace Lisa.Common.UnitTests
             Required("authors");
             Optional("authors.firstName");
             Required("authors.lastName", MinLength(5));
+        }
+    }
+
+    public class ArrayValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("numbers");
         }
     }
 }

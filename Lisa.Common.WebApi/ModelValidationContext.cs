@@ -162,9 +162,10 @@ namespace Lisa.Common.WebApi
         private bool IsNestedType(object value)
         {
             // Code adapted from http://stackoverflow.com/a/2483054
-            Type type = value.GetType();
-            return (type.Name.Contains("AnonymousType") && type.Name.StartsWith("<>"))
-                || (value is DynamicModel);
+            Type type = value?.GetType();
+            return type != null
+                && ((type.Name.Contains("AnonymousType") && type.Name.StartsWith("<>"))
+                || (value is DynamicModel));
         }
 
         private FieldTracker _fieldTracker;
