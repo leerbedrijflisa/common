@@ -40,7 +40,7 @@ namespace Lisa.Common.WebApi.Test
         {
             Required("title");
             Required("author", TypeOf(DataTypes.Object));
-            Required("author.firstName", NotEmpty);
+            Required("author.firstName", NotEmpty, Match(@"\w+"));
             Required("author.lastName", MinLength(5));
         }
     }

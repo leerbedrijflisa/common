@@ -334,6 +334,21 @@ namespace Lisa.Common.UnitTests
             Assert.False(result.HasErrors);
         }
 
+        [Fact]
+        public void ItSucceedsWhenParentIsRequired()
+        {
+            dynamic book = new DynamicModel();
+            dynamic author = new DynamicModel();
+            author.FirstName = "Anthony";
+            author.LastName = "Burgess";
+            book.Authors = author;
+
+            var validator = new AuthorValidator();
+            ValidationResult result = validator.Validate(book);
+
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();

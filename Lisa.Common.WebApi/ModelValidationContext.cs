@@ -122,6 +122,8 @@ namespace Lisa.Common.WebApi
                     yield break;
                 }
 
+                yield return property;
+
                 foreach (string nestedPropertyName in nestedPropertyNames)
                 {
                     // Code adapted from http://stackoverflow.com/a/7108263
