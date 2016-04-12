@@ -163,7 +163,8 @@ namespace Lisa.Common.WebApi
         {
             // Code adapted from http://stackoverflow.com/a/2483054
             Type type = value.GetType();
-            return type.Name.Contains("AnonymousType") && type.Name.StartsWith("<>");
+            return (type.Name.Contains("AnonymousType") && type.Name.StartsWith("<>"))
+                || (value is DynamicModel);
         }
 
         private FieldTracker _fieldTracker;

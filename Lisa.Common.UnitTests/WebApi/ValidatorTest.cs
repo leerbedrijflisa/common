@@ -304,6 +304,24 @@ namespace Lisa.Common.UnitTests
             Assert.Equal(ErrorCode.TooShort, error.Code);
         }
 
+        [Fact]
+        public void ItRunsValidationFunctionsOnNestedDynamicModels()
+        {
+            var validator = new AuthorValidator();
+            dynamic model = new DynamicModel();
+            dynamic author = new DynamicModel();
+            author.FirstName = "Victor";
+            author.LastName = "Hugo";
+            model.Authors = new[] { author };
+
+            ValidationResult result = validator.Validate(model);
+            Assert.True(result.HasErrors);
+            Assert.Equal(1, result.Errors.Count);
+
+            var error = result.Errors.First();
+            Assert.Equal(ErrorCode.TooShort, error.Code);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();

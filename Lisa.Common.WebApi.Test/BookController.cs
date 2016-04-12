@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNet.Mvc;
 
 namespace Lisa.Common.WebApi.Test
 {
@@ -16,6 +15,11 @@ namespace Lisa.Common.WebApi.Test
         [HttpPost]
         public ActionResult Post([FromBody] DynamicModel book)
         {
+            if (book == null)
+            {
+                return new BadRequestResult();
+            }
+
             var validator = new BookValidator();
             var validationResult = validator.Validate(book);
             if (validationResult.HasErrors)
@@ -36,7 +40,7 @@ namespace Lisa.Common.WebApi.Test
         {
             Required("title");
             Required("author.firstName", NotEmpty);
-            Required("author.lastName");
+            Required("author.lastName", MinLength(5));
         }
     }
 }
