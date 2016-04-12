@@ -66,7 +66,7 @@ namespace Lisa.Common.WebApi
                 return DataTypes.Array;
             }
 
-            return DataTypes.Unknown;
+            return DataTypes.Object;
         }
     }
 }

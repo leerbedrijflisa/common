@@ -139,6 +139,8 @@ namespace Lisa.Common.WebApi
             }
             else if (IsNestedType(property.Value))
             {
+                yield return property;
+
                 var nestedPropertiesInfos = property.Value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
                 foreach (PropertyInfo nestedPropertyInfo in nestedPropertiesInfos)

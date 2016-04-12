@@ -176,6 +176,21 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Contains("number", accepted);
         }
 
+        [Fact]
+        public void ItAcceptsAnAnonymousObject()
+        {
+            dynamic model = new DynamicModel();
+            model.Character = new
+            {
+                Name = "Rumpelstiltskin"
+            };
+
+            var validator = new IsObjectValidator();
+            ValidationResult result = validator.Validate(model);
+
+            Assert.False(result.HasErrors);
+        }
+
         private object AnonymousField(object obj, string fieldName)
         {
             var type = obj.GetType();
@@ -221,6 +236,15 @@ namespace Lisa.Common.UnitTests.WebApi
         protected override void ValidateModel()
         {
             Required("age", HasType(DataTypes.Number | DataTypes.String));
+        }
+    }
+
+    class IsObjectValidator : Validator
+    {
+        protected override void ValidateModel()
+        {
+            Required("character", HasType(DataTypes.Object));
+            Required("character.name");
         }
     }
 }

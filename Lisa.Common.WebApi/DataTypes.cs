@@ -9,6 +9,7 @@ namespace Lisa.Common.WebApi
         String = 1,
         Number = 2,
         Boolean = 4,
-        Array = 8
+        Array = 8,
+        Object = 16
     }
 }

@@ -231,6 +231,11 @@ namespace Lisa.Common.WebApi
                 types.Add("array");
             }
 
+            if ((type & DataTypes.Object) != 0)
+            {
+                types.Add("object");
+            }
+
             if (types.Count == 1)
             {
                 return types[0];

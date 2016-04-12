@@ -39,6 +39,7 @@ namespace Lisa.Common.WebApi.Test
         protected override void ValidateModel()
         {
             Required("title");
+            Required("author", HasType(DataTypes.Object));
             Required("author.firstName", NotEmpty);
             Required("author.lastName", MinLength(5));
         }
