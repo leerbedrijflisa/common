@@ -203,7 +203,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Optional("name", HasType(DataTypes.String));
+            Optional("name", TypeOf(DataTypes.String));
         }
     }
 
@@ -211,7 +211,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("age", HasType(DataTypes.Number));
+            Required("age", TypeOf(DataTypes.Number));
         }
     }
 
@@ -219,7 +219,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("isNice", HasType(DataTypes.Boolean));
+            Required("isNice", TypeOf(DataTypes.Boolean));
         }
     }
 
@@ -227,7 +227,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("traits", HasType(DataTypes.Array));
+            Required("traits", TypeOf(DataTypes.Array));
         }
     }
 
@@ -235,7 +235,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("age", HasType(DataTypes.Number | DataTypes.String));
+            Required("age", TypeOf(DataTypes.Number | DataTypes.String));
         }
     }
 
@@ -243,7 +243,7 @@ namespace Lisa.Common.UnitTests.WebApi
     {
         protected override void ValidateModel()
         {
-            Required("character", HasType(DataTypes.Object));
+            Required("character", TypeOf(DataTypes.Object));
             Required("character.name");
         }
     }

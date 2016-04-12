@@ -5,7 +5,7 @@ namespace Lisa.Common.WebApi
 {
     public partial class Validator
     {
-        protected virtual Action<string, object> HasType(DataTypes accepted)
+        protected virtual Action<string, object> TypeOf(DataTypes expected)
         {
             return (fieldName, value) =>
             {
@@ -16,27 +16,27 @@ namespace Lisa.Common.WebApi
 
                 DataTypes actual = GetDataType(value);
 
-                if ((actual & accepted) == 0)
+                if ((actual & expected) == 0)
                 {
-                    var error = Error.InvalidType(fieldName, value, accepted, actual);
+                    var error = Error.InvalidType(fieldName, value, expected, actual);
                     Result.Errors.Add(error);
                 }
             };
         }
 
-        protected virtual Action<string, object> IsArray(DataTypes accepted)
+        protected virtual Action<string, object> IsArray(DataTypes expected)
         {
             return (fieldName, value) =>
             {
                 DataTypes actual = GetDataType(value);
                 if ((actual & DataTypes.Array) == 0)
                 {
-                    var error = Error.InvalidType(fieldName, value, accepted, actual);
+                    var error = Error.InvalidType(fieldName, value, expected, actual);
                     Result.Errors.Add(error);
                     return;
                 }
 
-                var hasType = HasType(accepted);
+                var hasType = TypeOf(expected);
                 foreach (var element in (IEnumerable) value)
                 {
                     hasType(fieldName, element);
