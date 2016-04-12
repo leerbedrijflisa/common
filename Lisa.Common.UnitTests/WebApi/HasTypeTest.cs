@@ -34,7 +34,7 @@ namespace Lisa.Common.UnitTests.WebApi
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.InvalidType, error.Code);
             Assert.Equal("Name", AnonymousField(error.Values, "Field"));
-            Assert.Equal("string", AnonymousField(error.Values, "Accepted"));
+            Assert.Equal("string", AnonymousField(error.Values, "Expected"));
             Assert.Equal("number", AnonymousField(error.Values, "Actual"));
         }
 
@@ -53,7 +53,7 @@ namespace Lisa.Common.UnitTests.WebApi
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.InvalidType, error.Code);
             Assert.Equal("Name", AnonymousField(error.Values, "Field"));
-            Assert.Equal("string", AnonymousField(error.Values, "Accepted"));
+            Assert.Equal("string", AnonymousField(error.Values, "Expected"));
             Assert.Equal("boolean", AnonymousField(error.Values, "Actual"));
         }
 
@@ -72,7 +72,7 @@ namespace Lisa.Common.UnitTests.WebApi
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.InvalidType, error.Code);
             Assert.Equal("Name", AnonymousField(error.Values, "Field"));
-            Assert.Equal("string", AnonymousField(error.Values, "Accepted"));
+            Assert.Equal("string", AnonymousField(error.Values, "Expected"));
             Assert.Equal("array", AnonymousField(error.Values, "Actual"));
         }
 
@@ -127,7 +127,7 @@ namespace Lisa.Common.UnitTests.WebApi
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.InvalidType, error.Code);
             Assert.Equal("Age", AnonymousField(error.Values, "Field"));
-            Assert.Equal("number", AnonymousField(error.Values, "Accepted"));
+            Assert.Equal("number", AnonymousField(error.Values, "Expected"));
             Assert.Equal("string", AnonymousField(error.Values, "Actual"));
         }
 
@@ -168,7 +168,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            var accepted = (string[]) AnonymousField(error.Values, "Accepted");
+            var accepted = (string[]) AnonymousField(error.Values, "Expected");
             Assert.Equal(ErrorCode.InvalidType, error.Code);
             Assert.Equal("Age", AnonymousField(error.Values, "Field"));
             Assert.Equal("boolean", AnonymousField(error.Values, "Actual"));

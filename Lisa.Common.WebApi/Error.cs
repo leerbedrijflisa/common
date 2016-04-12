@@ -49,9 +49,9 @@ namespace Lisa.Common.WebApi
             };
         }
 
-        internal static Error IncorrectValue<T>(string field, T[] allowed, object actual)
+        internal static Error IncorrectValue<T>(string field, T[] expected, object actual)
         {
-            string values = string.Join(", ", allowed);
+            string values = string.Join(", ", expected);
             return new Error
             {
                 Code = ErrorCode.IncorrectValue,
@@ -59,7 +59,7 @@ namespace Lisa.Common.WebApi
                 Values = new
                 {
                     Field = field,
-                    Allowed = allowed,
+                    Expected = expected,
                     Actual = actual
                 }
             };
@@ -166,22 +166,22 @@ namespace Lisa.Common.WebApi
             };
         }
 
-        internal static Error InvalidType(string field, object value, DataTypes accepted, DataTypes actual)
+        internal static Error InvalidType(string field, object value, DataTypes expected, DataTypes actual)
         {
-            object acceptedType = ConvertDataType(accepted);
+            object expectedType = ConvertDataType(expected);
             object actualType = ConvertDataType(actual);
 
             
-            if (acceptedType is string)
+            if (expectedType is string)
             {
                 return new Error
                 {
                     Code = ErrorCode.InvalidType,
-                    Message = $"The value of field '{field}' should be of type '{acceptedType}', but is of type '{actualType}'.",
+                    Message = $"The value of field '{field}' should be of type '{expectedType}', but is of type '{actualType}'.",
                     Values = new
                     {
                         Field = field,
-                        Accepted = acceptedType,
+                        Expected = expectedType,
                         Actual = actualType,
                         Value = value
                     }
@@ -189,17 +189,17 @@ namespace Lisa.Common.WebApi
             }
             else
             {
-                string acceptedTypes;
-                acceptedTypes = string.Join(", ", acceptedType);
+                string expectedTypes;
+                expectedTypes = string.Join(", ", expectedType);
 
                 return new Error
                 {
                     Code = ErrorCode.InvalidType,
-                    Message = $"The value of field '{field}' is of type '{actualType}', but should be of one of the following types: {acceptedTypes}.",
+                    Message = $"The value of field '{field}' is of type '{actualType}', but should be of one of the following types: {expectedTypes}.",
                     Values = new
                     {
                         Field = field,
-                        Accepted = acceptedType,
+                        Expected = expectedType,
                         Actual = actualType,
                         Value = value
                     }

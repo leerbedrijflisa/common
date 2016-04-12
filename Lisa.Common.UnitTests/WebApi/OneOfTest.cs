@@ -32,7 +32,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            var values = (string[]) AnonymousField(error.Values, "Allowed");
+            var values = (string[]) AnonymousField(error.Values, "Expected");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
             Assert.Contains("good", values);
             Assert.Contains("okay", values);
@@ -64,7 +64,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            var values = (string[]) AnonymousField(error.Values, "Allowed");
+            var values = (string[]) AnonymousField(error.Values, "Expected");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
             Assert.Contains("good", values);
             Assert.Contains("okay", values);
@@ -96,7 +96,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            var values = (double[]) AnonymousField(error.Values, "Allowed");
+            var values = (double[]) AnonymousField(error.Values, "Expected");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
             Assert.Equal("Quarters", AnonymousField(error.Values, "Field"));
             Assert.Equal(0.15, AnonymousField(error.Values, "Actual"));
@@ -167,7 +167,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            var values = (double[]) AnonymousField(error.Values, "Allowed");
+            var values = (double[]) AnonymousField(error.Values, "Expected");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
             Assert.Equal("Quarters", AnonymousField(error.Values, "Field"));
             Assert.Equal("three", AnonymousField(error.Values, "Actual"));
@@ -202,7 +202,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            var values = (string[]) AnonymousField(error.Values, "Allowed");
+            var values = (string[]) AnonymousField(error.Values, "Expected");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
             Assert.Equal("pass", AnonymousField(error.Values, "Actual"));
             Assert.Contains("good", values);
@@ -235,7 +235,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            var values = (double[]) AnonymousField(error.Values, "Allowed");
+            var values = (double[]) AnonymousField(error.Values, "Expected");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
             Assert.Equal("Quarters", AnonymousField(error.Values, "Field"));
             Assert.Equal(0.24, AnonymousField(error.Values, "Actual"));
@@ -270,7 +270,7 @@ namespace Lisa.Common.UnitTests.WebApi
             Assert.Equal(1, result.Errors.Count);
 
             var error = result.Errors.First();
-            var values = (string[]) AnonymousField(error.Values, "Allowed");
+            var values = (string[]) AnonymousField(error.Values, "Expected");
             Assert.Equal(ErrorCode.IncorrectValue, error.Code);
             Assert.Contains("good", values);
             Assert.Contains("okay", values);

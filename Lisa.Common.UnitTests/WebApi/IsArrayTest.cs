@@ -34,7 +34,7 @@ namespace Lisa.Common.UnitTests.WebApi
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.InvalidType, error.Code);
             Assert.Equal("Directions", AnonymousField(error.Values, "Field"));
-            Assert.Equal("string", AnonymousField(error.Values, "Accepted"));
+            Assert.Equal("string", AnonymousField(error.Values, "Expected"));
             Assert.Equal("number", AnonymousField(error.Values, "Actual"));
             Assert.Equal(1, AnonymousField(result.Errors.ElementAt(0).Values, "Value"));
             Assert.Equal(2, AnonymousField(result.Errors.ElementAt(1).Values, "Value"));
@@ -57,7 +57,7 @@ namespace Lisa.Common.UnitTests.WebApi
             var error = result.Errors.First();
             Assert.Equal(ErrorCode.InvalidType, error.Code);
             Assert.Equal("Directions", AnonymousField(error.Values, "Field"));
-            Assert.Equal("string", AnonymousField(error.Values, "Accepted"));
+            Assert.Equal("string", AnonymousField(error.Values, "Expected"));
             Assert.Equal("number", AnonymousField(error.Values, "Actual"));
             Assert.Equal(2, AnonymousField(error.Values, "Value"));
         }
